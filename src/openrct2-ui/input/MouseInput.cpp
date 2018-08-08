@@ -344,7 +344,7 @@ void input_handle()
 {
     for (auto& w : g_window_list)
     {
-        window_event_unknown_07_call(w.get());
+        window_event_fixed_update_call(w.get());
     }
 
     invalidate_all_windows_after_input();

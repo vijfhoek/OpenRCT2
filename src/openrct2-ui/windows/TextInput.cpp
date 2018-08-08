@@ -49,7 +49,7 @@ static rct_widget window_text_input_widgets[] = {
 
 static void window_text_input_close(rct_window *w);
 static void window_text_input_mouseup(rct_window *w, rct_widgetindex widgetIndex);
-static void window_text_input_update7(rct_window *w);
+static void window_text_input_fixed_update(rct_window *w);
 static void window_text_input_invalidate(rct_window *w);
 static void window_text_input_paint(rct_window *w, rct_drawpixelinfo *dpi);
 static void draw_ime_composition(rct_drawpixelinfo * dpi, int cursorX, int cursorY);
@@ -63,7 +63,7 @@ static rct_window_event_list window_text_input_events = {
     nullptr,
     nullptr,
     nullptr,
-    window_text_input_update7,
+    window_text_input_fixed_update,
     nullptr,
     nullptr,
     nullptr,
@@ -295,7 +295,7 @@ void window_text_input_key(rct_window* w, char keychar)
     window_invalidate(w);
 }
 
-void window_text_input_update7(rct_window* w)
+void window_text_input_fixed_update(rct_window* w)
 {
     rct_window* calling_w = window_find_by_number(calling_class, calling_number);
     // If the calling window is closed then close the text
@@ -308,7 +308,10 @@ void window_text_input_update7(rct_window* w)
     // Used to blink the cursor.
     w->frame_no++;
     if (w->frame_no > 30)
+    {
         w->frame_no = 0;
+    }
+
     window_invalidate(w);
 }
 
