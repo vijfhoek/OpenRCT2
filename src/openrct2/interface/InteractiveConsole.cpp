@@ -1454,7 +1454,10 @@ void InteractiveConsole::Execute(const std::string& s)
     } while (*end != 0);
 
     if (argc == 0)
+    {
+        free(argv);
         return;
+    }
 
     bool validCommand = false;
     for (const auto& c : console_command_table)
