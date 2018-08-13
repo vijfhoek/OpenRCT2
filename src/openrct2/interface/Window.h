@@ -673,7 +673,7 @@ void window_event_mouse_down_call(rct_window* w, rct_widgetindex widgetIndex);
 void window_event_dropdown_call(rct_window* w, rct_widgetindex widgetIndex, int32_t dropdownIndex);
 void window_event_unknown_05_call(rct_window* w);
 void window_event_update_call(rct_window* w);
-void window_event_fixed_update_call(rct_window *w);
+void window_event_fixed_update_call(rct_window* w);
 void window_event_unknown_08_call(rct_window* w);
 void window_event_tool_update_call(rct_window* w, rct_widgetindex widgetIndex, int32_t x, int32_t y);
 void window_event_tool_down_call(rct_window* w, rct_widgetindex widgetIndex, int32_t x, int32_t y);

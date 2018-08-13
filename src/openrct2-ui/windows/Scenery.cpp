@@ -728,7 +728,7 @@ static void window_scenery_dropdown(rct_window* w, rct_widgetindex widgetIndex, 
  *
  *  rct2: 0x006E1B9F
  */
-static void window_scenery_fixed_update(rct_window *w)
+static void window_scenery_fixed_update(rct_window* w)
 {
     if (w->scenery.selected_scenery_id != -1)
     {

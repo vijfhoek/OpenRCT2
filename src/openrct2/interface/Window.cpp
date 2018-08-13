@@ -1468,7 +1468,7 @@ void window_event_update_call(rct_window* w)
         w->event_handlers->update(w);
 }
 
-void window_event_fixed_update_call(rct_window *w)
+void window_event_fixed_update_call(rct_window* w)
 {
     if (w->event_handlers->fixed_update != nullptr)
         w->event_handlers->fixed_update(w);
