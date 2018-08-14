@@ -167,7 +167,7 @@ static void ViewportDragBegin(rct_window* w)
         return;
     }
 
-    w->flags &= ~WF_SCROLLING_TO_LOCATION;
+    w->scrolling_to_location = false;
     gInputState = INPUT_STATE_VIEWPORT_RIGHT;
     gDragWidget.window_classification = w->classification;
     gDragWidget.window_number = w->number;
@@ -721,9 +721,8 @@ optional<int32_t> input_get_widget_cursor_id(rct_window* window, rct_widgetindex
 
         case WWT_FRAME:
         case WWT_RESIZE:
-            if (!(window->flags & WF_RESIZABLE)
-                || (window->min_width == window->max_width && window->min_height == window->max_height)
-                || mouseData.X < window->x + window->width - 19 || mouseData.Y < window->y + window->height - 19)
+            if (!window_can_resize(window) || mouseData.X < window->x + window->width - 19
+                || mouseData.Y < window->y + window->height - 19)
             {
                 return CURSOR_ARROW;
             }
@@ -783,7 +782,7 @@ void input_viewport_drag_continue()
         context_show_cursor();
         gInputState = INPUT_STATE_RESET;
     }
-    else if ((dx != 0 || dy != 0) && !(w->flags & WF_NO_SCROLLING))
+    else if ((dx != 0 || dy != 0) && !w->no_scrolling)
     {
         // User dragged a scrollable viewport
 

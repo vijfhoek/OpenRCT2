@@ -157,7 +157,9 @@ rct_window* window_staff_list_open()
     if (window != nullptr)
         return window;
 
-    window = window_create_auto_pos(WW, WH, &window_staff_list_events, WC_STAFF_LIST, WF_10 | WF_RESIZABLE);
+    window = window_create_auto_pos(WW, WH, &window_staff_list_events, WC_STAFF_LIST);
+    window->unknown_10 = true;
+    window->resizable = true;
     window->widgets = window_staff_list_widgets;
     window->enabled_widgets = (1 << WIDX_STAFF_LIST_CLOSE) | (1 << WIDX_STAFF_LIST_HANDYMEN_TAB)
         | (1 << WIDX_STAFF_LIST_MECHANICS_TAB) | (1 << WIDX_STAFF_LIST_SECURITY_TAB) | (1 << WIDX_STAFF_LIST_ENTERTAINERS_TAB)

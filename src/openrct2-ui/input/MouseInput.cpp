@@ -245,7 +245,7 @@ void input_store_mouse_input(int32_t state, int32_t x, int32_t y)
 void input_handle_edge_scroll()
 {
     rct_window* mainWindow = window_get_main();
-    if (mainWindow == nullptr || (mainWindow->flags & WF_NO_SCROLLING)
+    if (mainWindow == nullptr || mainWindow->no_scrolling
         || (gScreenFlags & (SCREEN_FLAGS_TRACK_MANAGER | SCREEN_FLAGS_TITLE_DEMO)) || mainWindow->viewport == nullptr
         || !context_has_focus())
     {

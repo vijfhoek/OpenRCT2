@@ -127,7 +127,7 @@ static void HandleScrolling()
 
     // Handle key scrolling
     rct_window* mainWindow = window_get_main();
-    if (mainWindow == nullptr || mainWindow->viewport == nullptr || (mainWindow->flags & WF_NO_SCROLLING)
+    if (mainWindow == nullptr || mainWindow->viewport == nullptr || mainWindow->no_scrolling
         || (gScreenFlags & (SCREEN_FLAGS_TRACK_MANAGER | SCREEN_FLAGS_TITLE_DEMO)))
     {
         return;

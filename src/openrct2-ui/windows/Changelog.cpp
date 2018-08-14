@@ -107,8 +107,8 @@ rct_window* window_changelog_open()
     int32_t screenWidth = context_get_width();
     int32_t screenHeight = context_get_height();
 
-    window = window_create_centred(
-        screenWidth * 4 / 5, screenHeight * 4 / 5, &window_changelog_events, WC_CHANGELOG, WF_RESIZABLE);
+    window = window_create_centred(screenWidth * 4 / 5, screenHeight * 4 / 5, &window_changelog_events, WC_CHANGELOG);
+    window->resizable = true;
     window->widgets = window_changelog_widgets;
     window->enabled_widgets = (1 << WIDX_CLOSE);
 

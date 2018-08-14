@@ -39,10 +39,78 @@ struct rct_window
     int16_t min_height;                    // 0x038
     int16_t max_height;                    // 0x03A
     rct_windownumber number;               // 0x03C
-    uint16_t flags;                        // 0x03E
-    rct_scroll scrolls[3];                 // 0x040
-    uint8_t list_item_positions[1024];     // 0x076
-    uint16_t no_list_items;                // 0x476 0 for no items
+
+    union
+    {
+        uint16_t flags; // 0x03E
+
+#pragma pack(push, 1)
+        struct
+        {
+            /**
+             * Whether the window will always be behind other windows.
+             */
+            bool stick_to_back : 1;
+
+            /**
+             * Whether the window will always be in front of other windows.
+             */
+            bool stick_to_front : 1;
+
+            /**
+             * Whether the viewport can not be scrolled.
+             */
+            bool no_scrolling : 1;
+
+            /**
+             * Whether the window should be scrolled to (saved_view_x, saved_view_y). Gets set to false when done.
+             */
+            bool scrolling_to_location : 1;
+
+            /**
+             * Whether the window is (partly) transparent.
+             */
+            bool transparent : 1;
+
+            /**
+             * Whether the window has no background.
+             */
+            bool no_background : 1;
+
+            bool unknown_06 : 1;
+            bool unknown_07 : 1;
+
+            /**
+             * Whether the window has a resize handle and can be resized.
+             */
+            bool resizable : 1;
+
+            /**
+             * Whether the window should not be closed whenever too many windows are open.
+             */
+            bool no_auto_close : 1;
+
+            bool unknown_10 : 1;
+            bool unknown_11 : 1;
+
+            /**
+             * How many more frames the window border has to be white for.
+             */
+            uint8_t white_border_frames : 2;
+
+            bool unknown_14 : 1;
+
+            /**
+             * Whether the window does not snap to other windows.
+             */
+            bool no_snapping : 1;
+        };
+#pragma pack(pop)
+    };
+
+    rct_scroll scrolls[3];             // 0x040
+    uint8_t list_item_positions[1024]; // 0x076
+    uint16_t no_list_items;            // 0x476 0 for no items
     int16_t pad_478;
     int16_t selected_list_item; // 0x47A -1 for none selected
     int16_t pad_47C;

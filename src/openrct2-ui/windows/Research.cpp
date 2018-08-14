@@ -235,7 +235,8 @@ rct_window* window_research_open()
     w = window_bring_to_front_by_class(WC_RESEARCH);
     if (w == nullptr)
     {
-        w = window_create_auto_pos(530, 257, window_research_page_events[0], WC_RESEARCH, WF_10);
+        w = window_create_auto_pos(530, 257, window_research_page_events[0], WC_RESEARCH);
+        w->unknown_10 = true;
         w->widgets = window_research_page_widgets[0];
         w->enabled_widgets = window_research_page_enabled_widgets[0];
         w->number = 0;

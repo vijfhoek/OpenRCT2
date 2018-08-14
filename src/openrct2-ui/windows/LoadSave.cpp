@@ -196,7 +196,8 @@ rct_window* window_loadsave_open(int32_t type, const char* defaultName)
     rct_window* w = window_bring_to_front_by_class(WC_LOADSAVE);
     if (w == nullptr)
     {
-        w = window_create_centred(WW, WH, &window_loadsave_events, WC_LOADSAVE, WF_STICK_TO_FRONT | WF_RESIZABLE);
+        w = window_create_centred(WW, WH, &window_loadsave_events, WC_LOADSAVE, WF_STICK_TO_FRONT);
+        w->resizable = true;
         w->widgets = window_loadsave_widgets;
         w->enabled_widgets = (1 << WIDX_CLOSE) | (1 << WIDX_UP) | (1 << WIDX_NEW_FOLDER) | (1 << WIDX_NEW_FILE)
             | (1 << WIDX_SORT_NAME) | (1 << WIDX_SORT_DATE) | (1 << WIDX_BROWSE) | (1 << WIDX_DEFAULT);
@@ -1144,7 +1145,7 @@ static rct_window* window_overwrite_prompt_open(const char* name, const char* pa
 
     window_init_scroll_widgets(w);
 
-    w->flags |= WF_TRANSPARENT;
+    w->transparent = true;
     w->colours[0] = TRANSLUCENT(COLOUR_BORDEAUX_RED);
 
     safe_strcpy(_window_overwrite_prompt_name, name, sizeof(_window_overwrite_prompt_name));

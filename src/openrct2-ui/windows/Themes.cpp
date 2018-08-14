@@ -329,7 +329,9 @@ rct_window* window_themes_open()
     if (window != nullptr)
         return window;
 
-    window = window_create_auto_pos(320, 107, &window_themes_events, WC_THEMES, WF_10 | WF_RESIZABLE);
+    window = window_create_auto_pos(320, 107, &window_themes_events, WC_THEMES);
+    window->unknown_10 = true;
+    window->resizable = true;
     window->widgets = window_themes_widgets;
     window->enabled_widgets = (1 << WIDX_THEMES_CLOSE) | (1 << WIDX_THEMES_SETTINGS_TAB) | (1 << WIDX_THEMES_MAIN_UI_TAB)
         | (1 << WIDX_THEMES_PARK_TAB) | (1 << WIDX_THEMES_TOOLS_TAB) | (1 << WIDX_THEMES_RIDE_PEEPS_TAB)

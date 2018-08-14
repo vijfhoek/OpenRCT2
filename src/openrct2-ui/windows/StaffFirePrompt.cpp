@@ -85,7 +85,8 @@ rct_window* window_staff_fire_prompt_open(rct_peep* peep)
         return w;
     }
 
-    w = window_create_centred(WW, WH, &window_staff_fire_events, WC_FIRE_PROMPT, WF_TRANSPARENT);
+    w = window_create_centred(WW, WH, &window_staff_fire_events, WC_FIRE_PROMPT);
+    w->transparent = true;
     w->widgets = window_staff_fire_widgets;
     w->enabled_widgets |= (1 << WIDX_CLOSE) | (1 << WIDX_YES) | (1 << WIDX_CANCEL);
 

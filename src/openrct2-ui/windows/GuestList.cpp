@@ -185,7 +185,10 @@ rct_window* window_guest_list_open()
     if (window != nullptr)
         return window;
 
-    window = window_create_auto_pos(350, 330, &window_guest_list_events, WC_GUEST_LIST, WF_10 | WF_RESIZABLE);
+    window = window_create_auto_pos(350, 330, &window_guest_list_events, WC_GUEST_LIST);
+    window->unknown_10 = true;
+    window->resizable = true;
+
     window->widgets = window_guest_list_widgets;
     window->enabled_widgets = (1 << WIDX_CLOSE) | (1 << WIDX_PAGE_DROPDOWN) | (1 << WIDX_PAGE_DROPDOWN_BUTTON)
         | (1 << WIDX_INFO_TYPE_DROPDOWN) | (1 << WIDX_INFO_TYPE_DROPDOWN_BUTTON) | (1 << WIDX_MAP) | (1 << WIDX_TRACKING)

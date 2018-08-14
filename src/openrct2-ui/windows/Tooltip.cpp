@@ -120,7 +120,8 @@ void window_tooltip_show(rct_string_id id, int32_t x, int32_t y)
         y -= height + 40;
     y = std::clamp(y, 22, max_y);
 
-    w = window_create(x, y, width, height, &window_tooltip_events, WC_TOOLTIP, WF_TRANSPARENT | WF_STICK_TO_FRONT);
+    w = window_create(x, y, width, height, &window_tooltip_events, WC_TOOLTIP, WF_STICK_TO_FRONT);
+    w->transparent = true;
     w->widgets = window_tooltip_widgets;
 
     reset_tooltip_not_shown();

@@ -524,7 +524,8 @@ rct_window* window_mapgen_open()
         return w;
     }
 
-    w = window_create_centred(WW, WH, PageEvents[WINDOW_MAPGEN_PAGE_BASE], WC_MAPGEN, WF_10);
+    w = window_create_centred(WW, WH, PageEvents[WINDOW_MAPGEN_PAGE_BASE], WC_MAPGEN);
+    w->unknown_10 = true;
     w->number = 0;
     w->frame_no = 0;
 

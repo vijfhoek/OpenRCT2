@@ -63,7 +63,7 @@ void input_window_positioning(const input_mouse_data& mouseData)
         return;
     }
 
-    int32_t snapProximity = (w->flags & WF_NO_SNAPPING) ? 0 : gConfigGeneral.window_snap_proximity;
+    int32_t snapProximity = w->no_snapping ? 0 : gConfigGeneral.window_snap_proximity;
     window_move_and_snap(w, mouseData.X - gInputDragLastX, mouseData.Y - gInputDragLastY, snapProximity);
 
     if (mouseData.State == MOUSE_STATE_LEFT_RELEASE)

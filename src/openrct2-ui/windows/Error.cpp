@@ -138,9 +138,13 @@ rct_window* window_error_open(rct_string_id title, rct_string_id message)
         y = std::min(y, maxY);
     }
 
-    w = window_create(x, y, width, height, &window_error_events, WC_ERROR, WF_STICK_TO_FRONT | WF_TRANSPARENT | WF_RESIZABLE);
+    w = window_create(x, y, width, height, &window_error_events, WC_ERROR, WF_STICK_TO_FRONT);
+    w->transparent = true;
+    w->resizable = true;
+
     w->widgets = window_error_widgets;
     w->error.var_480 = 0;
+
     if (!gDisableErrorWindowSound)
     {
         audio_play_sound(SOUND_ERROR, 0, w->x + (w->width / 2));

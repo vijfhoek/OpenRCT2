@@ -188,7 +188,8 @@ rct_window* window_player_open(uint8_t id)
     window = window_bring_to_front_by_number(WC_PLAYER, id);
     if (window == nullptr)
     {
-        window = window_create_auto_pos(240, 170, &window_player_overview_events, WC_PLAYER, WF_RESIZABLE);
+        window = window_create_auto_pos(240, 170, &window_player_overview_events, WC_PLAYER);
+        window->resizable = true;
         window->number = id;
         window->page = 0;
         window->viewport_focus_coordinates.y = 0;
@@ -559,7 +560,7 @@ static void window_player_set_page(rct_window* w, int32_t page)
         if (w->viewport == nullptr)
         {
             viewport_create(w, w->x, w->y, w->width, w->height, 0, 128 * 32, 128 * 32, 0, 1, -1);
-            w->flags |= WF_NO_SCROLLING;
+            w->no_scrolling = true;
             window_event_invalidate_call(w);
             window_player_update_viewport(w, false);
         }
@@ -636,7 +637,7 @@ static void window_player_update_viewport(rct_window* w, bool scroll)
 
             if (!scroll || w->saved_view_x != viewX || w->saved_view_y != viewY)
             {
-                w->flags |= WF_SCROLLING_TO_LOCATION;
+                w->scrolling_to_location = true;
                 w->saved_view_x = viewX;
                 w->saved_view_y = viewY;
                 if (!scroll)

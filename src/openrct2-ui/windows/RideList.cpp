@@ -200,7 +200,9 @@ rct_window* window_ride_list_open()
     window = window_bring_to_front_by_class(WC_RIDE_LIST);
     if (window == nullptr)
     {
-        window = window_create_auto_pos(340, 240, &window_ride_list_events, WC_RIDE_LIST, WF_10 | WF_RESIZABLE);
+        window = window_create_auto_pos(340, 240, &window_ride_list_events, WC_RIDE_LIST);
+        window->unknown_10 = true;
+        window->resizable = true;
         window->widgets = window_ride_list_widgets;
         window->enabled_widgets = (1 << WIDX_CLOSE) | (1 << WIDX_OPEN_CLOSE_ALL) | (1 << WIDX_CURRENT_INFORMATION_TYPE)
             | (1 << WIDX_INFORMATION_TYPE_DROPDOWN) | (1 << WIDX_SORT) | (1 << WIDX_TAB_1) | (1 << WIDX_TAB_2)

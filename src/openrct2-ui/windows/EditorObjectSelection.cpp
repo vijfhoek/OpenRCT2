@@ -378,8 +378,10 @@ rct_window* window_editor_object_selection_open()
     sub_6AB211();
     reset_selected_object_count_and_size();
 
-    window = window_create_centred(
-        600, 400, &window_editor_object_selection_events, WC_EDITOR_OBJECT_SELECTION, WF_10 | WF_RESIZABLE);
+    window = window_create_centred(600, 400, &window_editor_object_selection_events, WC_EDITOR_OBJECT_SELECTION);
+    window->unknown_10 = true;
+    window->resizable = true;
+
     window->widgets = _window_editor_object_selection_widgets.data();
     window->widgets[WIDX_FILTER_STRING_BUTTON].string = _filter_string;
 

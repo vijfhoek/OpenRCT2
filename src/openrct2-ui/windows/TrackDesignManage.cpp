@@ -140,8 +140,8 @@ rct_window* window_track_manage_open(track_design_file_ref* tdFileRef)
 {
     window_close_by_class(WC_MANAGE_TRACK_DESIGN);
 
-    rct_window* w = window_create_centred(
-        250, 44, &window_track_manage_events, WC_MANAGE_TRACK_DESIGN, WF_STICK_TO_FRONT | WF_TRANSPARENT);
+    rct_window* w = window_create_centred(250, 44, &window_track_manage_events, WC_MANAGE_TRACK_DESIGN, WF_STICK_TO_FRONT);
+    w->transparent = true;
     w->widgets = window_track_manage_widgets;
     w->enabled_widgets = (1 << WIDX_CLOSE) | (1 << WIDX_RENAME) | (1 << WIDX_DELETE);
     window_init_scroll_widgets(w);
@@ -253,7 +253,7 @@ static void window_track_delete_prompt_open()
     w->widgets = window_track_delete_prompt_widgets;
     w->enabled_widgets = (1 << WIDX_CLOSE) | (1 << WIDX_RENAME) | (1 << WIDX_DELETE);
     window_init_scroll_widgets(w);
-    w->flags |= WF_TRANSPARENT;
+    w->transparent = true;
 }
 
 /**
@@ -268,6 +268,7 @@ static void window_track_delete_prompt_mouseup(rct_window* w, rct_widgetindex wi
         case WIDX_PROMPT_CANCEL:
             window_close(w);
             break;
+
         case WIDX_PROMPT_DELETE:
             window_close(w);
             if (track_repository_delete(_trackDesignFileReference->path))

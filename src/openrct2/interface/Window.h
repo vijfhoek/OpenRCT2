@@ -289,30 +289,8 @@ enum WINDOW_EVENTS
 
 enum WINDOW_FLAGS
 {
-    /*
-    WF_TIMEOUT_SHL = 0,
-    WF_TIMEOUT_MASK = 7,
-    WF_DRAGGING = 1 << 3,
-    WF_SCROLLER_UP = 1 << 4,
-    WF_SCROLLER_DOWN = 1 << 5,
-    WF_SCROLLER_MIDDLE = 1 << 6,
-    WF_DISABLE_VP_SCROLL = 1 << 9,
-    */
-
     WF_STICK_TO_BACK = (1 << 0),
     WF_STICK_TO_FRONT = (1 << 1),
-    WF_NO_SCROLLING = (1 << 2), // User is unable to scroll this viewport
-    WF_SCROLLING_TO_LOCATION = (1 << 3),
-    WF_TRANSPARENT = (1 << 4),
-    WF_NO_BACKGROUND = (1 << 5), // Instead of half transparency, completely remove the window background
-    WF_7 = (1 << 7),
-    WF_RESIZABLE = (1 << 8),
-    WF_NO_AUTO_CLOSE = (1 << 9), // Don't auto close this window if too many windows are open
-    WF_10 = (1 << 10),
-    WF_WHITE_BORDER_ONE = (1 << 12),
-    WF_WHITE_BORDER_MASK = (1 << 12) | (1 << 13),
-
-    WF_NO_SNAPPING = (1 << 15)
 };
 
 enum SCROLL_FLAGS
@@ -576,11 +554,14 @@ void window_set_window_limit(int32_t value);
 
 rct_window* window_create(
     int32_t x, int32_t y, int32_t width, int32_t height, rct_window_event_list* event_handlers, rct_windowclass cls,
-    uint16_t flags);
+    uint16_t flags = 0);
+
 rct_window* window_create_auto_pos(
-    int32_t width, int32_t height, rct_window_event_list* event_handlers, rct_windowclass cls, uint16_t flags);
+    int32_t width, int32_t height, rct_window_event_list* event_handlers, rct_windowclass cls, uint16_t flags = 0);
+
 rct_window* window_create_centred(
-    int32_t width, int32_t height, rct_window_event_list* event_handlers, rct_windowclass cls, uint16_t flags);
+    int32_t width, int32_t height, rct_window_event_list* event_handlers, rct_windowclass cls, uint16_t flags = 0);
+
 void window_close(rct_window* window);
 void window_close_by_class(rct_windowclass cls);
 void window_close_by_number(rct_windowclass cls, rct_windownumber number);
@@ -604,8 +585,7 @@ void window_update_scroll_widgets(rct_window* w);
 int32_t window_get_scroll_data_index(rct_window* w, rct_widgetindex widget_index);
 
 rct_window* window_bring_to_front(rct_window* w);
-rct_window* window_bring_to_front_by_class(rct_windowclass cls);
-rct_window* window_bring_to_front_by_class_with_flags(rct_windowclass cls, uint16_t flags);
+rct_window* window_bring_to_front_by_class(rct_windowclass cls, bool flashBorder = true);
 rct_window* window_bring_to_front_by_number(rct_windowclass cls, rct_windownumber number);
 
 void window_push_others_right(rct_window* w);

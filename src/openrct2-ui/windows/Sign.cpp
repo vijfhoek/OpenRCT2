@@ -143,7 +143,8 @@ rct_window* window_sign_open(rct_windownumber number)
     if (w != nullptr)
         return w;
 
-    w = window_create_auto_pos(WW, WH, &window_sign_events, WC_BANNER, WF_NO_SCROLLING);
+    w = window_create_auto_pos(WW, WH, &window_sign_events, WC_BANNER);
+    w->no_scrolling = true;
     w->widgets = window_sign_widgets;
     w->enabled_widgets = (1 << WIDX_CLOSE) | (1 << WIDX_SIGN_TEXT) | (1 << WIDX_SIGN_DEMOLISH) | (1 << WIDX_MAIN_COLOUR)
         | (1 << WIDX_TEXT_COLOUR);
@@ -437,7 +438,7 @@ rct_window* window_sign_small_open(rct_windownumber number)
         (viewportWidget->bottom - viewportWidget->top) - 1, 0, view_x, view_y, view_z, 0, -1);
 
     w->viewport->flags = gConfigGeneral.always_show_gridlines ? VIEWPORT_FLAG_GRIDLINES : 0;
-    w->flags |= WF_NO_SCROLLING;
+    w->no_scrolling = true;
     window_invalidate(w);
 
     return w;

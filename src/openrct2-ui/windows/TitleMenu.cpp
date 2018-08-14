@@ -81,9 +81,9 @@ rct_window* window_title_menu_open()
 {
     rct_window* window;
 
-    window = window_create(
-        0, context_get_height() - 142, 0, 100, &window_title_menu_events, WC_TITLE_MENU,
-        WF_STICK_TO_BACK | WF_TRANSPARENT | WF_NO_BACKGROUND);
+    window = window_create(0, context_get_height() - 142, 0, 100, &window_title_menu_events, WC_TITLE_MENU, WF_STICK_TO_BACK);
+    window->transparent = true;
+    window->no_background = true;
     window->widgets = window_title_menu_widgets;
     window->enabled_widgets
         = ((1 << WIDX_START_NEW_GAME) | (1 << WIDX_CONTINUE_SAVED_GAME) |

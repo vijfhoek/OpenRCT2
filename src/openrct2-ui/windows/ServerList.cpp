@@ -147,7 +147,9 @@ rct_window* window_server_list_open()
     if (window != nullptr)
         return window;
 
-    window = window_create_centred(WWIDTH_MIN, WHEIGHT_MIN, &window_server_list_events, WC_SERVER_LIST, WF_10 | WF_RESIZABLE);
+    window = window_create_centred(WWIDTH_MIN, WHEIGHT_MIN, &window_server_list_events, WC_SERVER_LIST);
+    window->unknown_10 = true;
+    window->resizable = true;
 
     window_server_list_widgets[WIDX_PLAYER_NAME_INPUT].string = _playerName;
     window->widgets = window_server_list_widgets;

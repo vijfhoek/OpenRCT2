@@ -306,7 +306,9 @@ rct_window* window_multiplayer_open()
     rct_window* window = window_bring_to_front_by_class(WC_MULTIPLAYER);
     if (window == nullptr)
     {
-        window = window_create_auto_pos(320, 144, &window_multiplayer_players_events, WC_MULTIPLAYER, WF_10 | WF_RESIZABLE);
+        window = window_create_auto_pos(320, 144, &window_multiplayer_players_events, WC_MULTIPLAYER);
+        window->unknown_10 = true;
+        window->resizable = true;
         window_multiplayer_set_page(window, WINDOW_MULTIPLAYER_PAGE_INFORMATION);
     }
 

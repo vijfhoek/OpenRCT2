@@ -88,7 +88,8 @@ static int32_t _viewportNumber = 1;
  */
 rct_window* window_viewport_open()
 {
-    rct_window* w = window_create_auto_pos(INITIAL_WIDTH, INITIAL_HEIGHT, &window_viewport_events, WC_VIEWPORT, WF_RESIZABLE);
+    rct_window* w = window_create_auto_pos(INITIAL_WIDTH, INITIAL_HEIGHT, &window_viewport_events, WC_VIEWPORT);
+    w->resizable = true;
     w->widgets = window_viewport_widgets;
     w->enabled_widgets = (1 << WIDX_CLOSE) | (1 << WIDX_ZOOM_IN) | (1 << WIDX_ZOOM_OUT) | (1 << WIDX_LOCATE);
     w->number = _viewportNumber++;
@@ -160,7 +161,7 @@ static void window_viewport_mouseup(rct_window* w, rct_widgetindex widgetIndex)
 
 static void window_viewport_resize(rct_window* w)
 {
-    w->flags |= WF_RESIZABLE;
+    w->resizable = true;
     window_set_resize(w, 200, 200, 2000, 2000);
 }
 

@@ -371,7 +371,7 @@ static void viewport_shift_pixels(
     for (auto i = window_get_index(window); i < g_window_list.size(); i++)
     {
         auto w = g_window_list[i].get();
-        if (!(w->flags & WF_TRANSPARENT))
+        if (!w->transparent)
             continue;
         if (w->viewport == viewport)
             continue;
@@ -429,7 +429,7 @@ static void viewport_move(int16_t x, int16_t y, rct_window* w, rct_viewport* vie
     if ((!x_diff) && (!y_diff))
         return;
 
-    if (w->flags & WF_7)
+    if (w->unknown_07)
     {
         int32_t left = std::max<int32_t>(viewport->x, 0);
         int32_t top = std::max<int32_t>(viewport->y, 0);
@@ -593,7 +593,7 @@ void viewport_update_position(rct_window* window)
 
     x = window->saved_view_x;
     y = window->saved_view_y;
-    if (window->flags & WF_SCROLLING_TO_LOCATION)
+    if (window->scrolling_to_location)
     {
         // Moves the viewport if focusing in on an item
         uint8_t flags = 0;
@@ -615,7 +615,7 @@ void viewport_update_position(rct_window* window)
         // If we are at the final zoom position
         if (!x && !y)
         {
-            window->flags &= ~WF_SCROLLING_TO_LOCATION;
+            window->scrolling_to_location = false;
         }
         if (flags & 1)
         {

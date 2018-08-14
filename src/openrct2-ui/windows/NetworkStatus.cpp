@@ -80,11 +80,15 @@ rct_window* window_network_status_open(const char* text, close_callback onClose)
     safe_strcpy(window_network_status_text, text, sizeof(window_network_status_text));
 
     // Check if window is already open
-    rct_window* window = window_bring_to_front_by_class_with_flags(WC_NETWORK_STATUS, 0);
+    rct_window* window = window_bring_to_front_by_class(WC_NETWORK_STATUS, false);
     if (window != nullptr)
+    {
         return window;
+    }
 
-    window = window_create_centred(420, 90, &window_network_status_events, WC_NETWORK_STATUS, WF_10 | WF_TRANSPARENT);
+    window = window_create_centred(420, 90, &window_network_status_events, WC_NETWORK_STATUS);
+    window->unknown_10 = true;
+    window->transparent = true;
 
     window->widgets = window_network_status_widgets;
     window->enabled_widgets = 1 << WIDX_CLOSE;

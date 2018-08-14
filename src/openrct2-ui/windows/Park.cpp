@@ -555,7 +555,8 @@ static rct_window* window_park_open()
 {
     rct_window* w;
 
-    w = window_create_auto_pos(230, 174 + 9, &window_park_entrance_events, WC_PARK_INFORMATION, WF_10);
+    w = window_create_auto_pos(230, 174 + 9, &window_park_entrance_events, WC_PARK_INFORMATION);
+    w->unknown_10 = true;
     w->widgets = window_park_entrance_widgets;
     w->enabled_widgets = window_park_page_enabled_widgets[WINDOW_PARK_PAGE_ENTRANCE];
     w->number = 0;
@@ -672,7 +673,7 @@ static void window_park_entrance_mouseup(rct_window* w, rct_widgetindex widgetIn
  */
 static void window_park_entrance_resize(rct_window* w)
 {
-    w->flags |= WF_RESIZABLE;
+    w->resizable = true;
     window_set_resize(w, 230, 174 + 9, 230 * 3, (274 + 9) * 3);
     window_park_init_viewport(w);
 }

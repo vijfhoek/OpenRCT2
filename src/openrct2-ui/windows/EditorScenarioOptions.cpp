@@ -370,8 +370,8 @@ rct_window* window_editor_scenario_options_open()
     if (w != nullptr)
         return w;
 
-    w = window_create_centred(
-        280, 148, window_editor_scenario_options_page_events[0], WC_EDITOR_SCENARIO_OPTIONS, WF_NO_SCROLLING);
+    w = window_create_centred(280, 148, window_editor_scenario_options_page_events[0], WC_EDITOR_SCENARIO_OPTIONS);
+    w->no_scrolling = true;
     w->widgets = window_editor_scenario_options_widgets[0];
     w->enabled_widgets = window_editor_scenario_options_page_enabled_widgets[0];
     w->hold_down_widgets = window_editor_scenario_options_page_hold_down_widgets[0];

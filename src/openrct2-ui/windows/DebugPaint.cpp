@@ -92,7 +92,8 @@ rct_window* window_debug_paint_open()
 
     window = window_create(
         16, context_get_height() - 16 - 33 - WINDOW_HEIGHT, WINDOW_WIDTH, WINDOW_HEIGHT, &window_debug_paint_events,
-        WC_DEBUG_PAINT, WF_STICK_TO_FRONT | WF_TRANSPARENT);
+        WC_DEBUG_PAINT, WF_STICK_TO_FRONT);
+    window->transparent = true;
 
     window->widgets = window_debug_paint_widgets;
     window->enabled_widgets = (1 << WIDX_TOGGLE_SHOW_WIDE_PATHS) | (1 << WIDX_TOGGLE_SHOW_BLOCKED_TILES)

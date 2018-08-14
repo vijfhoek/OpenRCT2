@@ -385,8 +385,10 @@ rct_window* window_editor_inventions_list_open()
 
     research_always_researched_setup();
 
-    w = window_create_centred(
-        WW, WH, &window_editor_inventions_list_events, WC_EDITOR_INVENTION_LIST, WF_NO_SCROLLING | WF_RESIZABLE);
+    w = window_create_centred(WW, WH, &window_editor_inventions_list_events, WC_EDITOR_INVENTION_LIST);
+    w->no_scrolling = true;
+    w->resizable = true;
+
     w->widgets = window_editor_inventions_list_widgets;
     w->enabled_widgets = (1 << WIDX_CLOSE) | (1 << WIDX_RESIZE) | (1 << WIDX_TAB_1) | (1 << WIDX_RANDOM_SHUFFLE)
         | (1 << WIDX_MOVE_ITEMS_TO_BOTTOM) | (1 << WIDX_MOVE_ITEMS_TO_TOP);
@@ -863,7 +865,9 @@ static void window_editor_inventions_list_drag_open(rct_research_item* researchI
 
     w = window_create(
         gTooltipCursorX - (stringWidth / 2), gTooltipCursorY - 7, stringWidth, 14, &window_editor_inventions_list_drag_events,
-        WC_EDITOR_INVENTION_LIST_DRAG, WF_STICK_TO_FRONT | WF_TRANSPARENT | WF_NO_SNAPPING);
+        WC_EDITOR_INVENTION_LIST_DRAG, WF_STICK_TO_FRONT);
+    w->transparent = true;
+    w->no_snapping = true;
     w->widgets = window_editor_inventions_list_drag_widgets;
     w->colours[1] = COLOUR_WHITE;
     input_window_position_begin(w, 0, gTooltipCursorX, gTooltipCursorY);

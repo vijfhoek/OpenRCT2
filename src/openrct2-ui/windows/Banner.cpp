@@ -121,7 +121,8 @@ rct_window* window_banner_open(rct_windownumber number)
     if (w != nullptr)
         return w;
 
-    w = window_create_auto_pos(WW, WH, &window_banner_events, WC_BANNER, WF_NO_SCROLLING);
+    w = window_create_auto_pos(WW, WH, &window_banner_events, WC_BANNER);
+    w->no_scrolling = true;
     w->widgets = window_banner_widgets;
     w->enabled_widgets = (1 << WIDX_CLOSE) | (1 << WIDX_BANNER_TEXT) | (1 << WIDX_BANNER_NO_ENTRY) | (1 << WIDX_BANNER_DEMOLISH)
         | (1 << WIDX_MAIN_COLOUR) | (1 << WIDX_TEXT_COLOUR_DROPDOWN) | (1 << WIDX_TEXT_COLOUR_DROPDOWN_BUTTON);

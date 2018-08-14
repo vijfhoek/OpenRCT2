@@ -222,7 +222,8 @@ rct_window* window_map_open()
         return nullptr;
     }
 
-    w = window_create_auto_pos(245, 259, &window_map_events, WC_MAP, WF_10);
+    w = window_create_auto_pos(245, 259, &window_map_events, WC_MAP);
+    w->unknown_10 = true;
     w->widgets = window_map_widgets;
     w->enabled_widgets = (1 << WIDX_CLOSE) | (1 << WIDX_PEOPLE_TAB) | (1 << WIDX_RIDES_TAB) | (1 << WIDX_MAP_SIZE_SPINNER)
         | (1 << WIDX_MAP_SIZE_SPINNER_UP) | (1 << WIDX_MAP_SIZE_SPINNER_DOWN) | (1 << WIDX_LAND_TOOL)
@@ -383,7 +384,7 @@ static void window_map_mouseup(rct_window* w, rct_widgetindex widgetIndex)
  */
 static void window_map_resize(rct_window* w)
 {
-    w->flags |= WF_RESIZABLE;
+    w->resizable = true;
     w->min_width = 245;
     w->max_width = 800;
     w->min_height = 259;

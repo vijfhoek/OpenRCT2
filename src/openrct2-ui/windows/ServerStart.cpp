@@ -111,7 +111,8 @@ rct_window* window_server_start_open()
     if (window != nullptr)
         return window;
 
-    window = window_create_centred(WW, WH, &window_server_start_events, WC_SERVER_START, WF_10);
+    window = window_create_centred(WW, WH, &window_server_start_events, WC_SERVER_START);
+    window->unknown_10 = true;
 
     window_server_start_widgets[WIDX_PORT_INPUT].string = _port;
     window_server_start_widgets[WIDX_NAME_INPUT].string = _name;

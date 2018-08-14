@@ -1516,7 +1516,9 @@ static rct_window* window_ride_open(int32_t rideIndex)
 {
     rct_window* w;
 
-    w = window_create_auto_pos(316, 207, window_ride_page_events[0], WC_RIDE, WF_10 | WF_RESIZABLE);
+    w = window_create_auto_pos(316, 207, window_ride_page_events[0], WC_RIDE);
+    w->unknown_10 = true;
+    w->resizable = true;
     w->widgets = window_ride_page_widgets[WINDOW_RIDE_PAGE_MAIN];
     w->enabled_widgets = window_ride_page_enabled_widgets[WINDOW_RIDE_PAGE_MAIN];
     w->hold_down_widgets = window_ride_page_hold_down_widgets[WINDOW_RIDE_PAGE_MAIN];
@@ -1928,7 +1930,7 @@ static void window_ride_init_viewport(rct_window* w)
             w, x, y, width, height, focus.coordinate.zoom, focus.coordinate.x, focus.coordinate.y & VIEWPORT_FOCUS_Y_MASK,
             focus.coordinate.z, focus.sprite.type & VIEWPORT_FOCUS_TYPE_MASK, focus.sprite.sprite_id);
 
-        w->flags |= WF_NO_SCROLLING;
+        w->no_scrolling = true;
         window_invalidate(w);
     }
     if (w->viewport)
@@ -2025,7 +2027,7 @@ static void window_ride_main_mouseup(rct_window* w, rct_widgetindex widgetIndex)
 static void window_ride_main_resize(rct_window* w)
 {
     const int32_t offset = gCheatsAllowArbitraryRideTypeChanges ? 15 : 0;
-    w->flags |= WF_RESIZABLE;
+    w->resizable = true;
     int32_t minHeight = 180 + offset;
     if (theme_get_flags() & UITHEME_FLAG_USE_LIGHTS_RIDE)
         minHeight = 200 + offset + RCT1_LIGHT_OFFSET
@@ -4977,7 +4979,7 @@ static void window_ride_music_mouseup(rct_window* w, rct_widgetindex widgetIndex
  */
 static void window_ride_music_resize(rct_window* w)
 {
-    w->flags |= WF_RESIZABLE;
+    w->resizable = true;
     window_set_resize(w, 316, 81, 316, 81);
 }
 
@@ -6572,7 +6574,7 @@ static void window_ride_customer_mouseup(rct_window* w, rct_widgetindex widgetIn
  */
 static void window_ride_customer_resize(rct_window* w)
 {
-    w->flags |= WF_RESIZABLE;
+    w->resizable = true;
     window_set_resize(w, 316, 163, 316, 163);
 }
 

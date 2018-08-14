@@ -527,7 +527,8 @@ rct_window* window_finances_open()
     w = window_bring_to_front_by_class(WC_FINANCES);
     if (w == nullptr)
     {
-        w = window_create_auto_pos(530, 310, _windowFinancesPageEvents[0], WC_FINANCES, WF_10);
+        w = window_create_auto_pos(530, 310, _windowFinancesPageEvents[0], WC_FINANCES);
+        w->unknown_10 = true;
         w->number = 0;
         w->frame_no = 0;
 

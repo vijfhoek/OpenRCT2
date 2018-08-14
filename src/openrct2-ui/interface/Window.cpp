@@ -35,7 +35,7 @@ static bool window_fits_between_others(int32_t x, int32_t y, int32_t width, int3
 {
     for (auto& w : g_window_list)
     {
-        if (w->flags & WF_STICK_TO_BACK)
+        if (w->stick_to_back)
             continue;
 
         if (x + width <= w->x)
@@ -96,7 +96,7 @@ rct_window* window_create(
         // Close least recently used window
         for (auto& w : g_window_list)
         {
-            if (!(w->flags & (WF_STICK_TO_BACK | WF_STICK_TO_FRONT | WF_NO_AUTO_CLOSE)))
+            if (!w->stick_to_back && !w->stick_to_front && !w->no_auto_close)
             {
                 window_close(w.get());
                 break;
@@ -110,7 +110,7 @@ rct_window* window_create(
     {
         for (size_t i = 0; i < g_window_list.size(); i++)
         {
-            if (!(g_window_list[i]->flags & WF_STICK_TO_BACK))
+            if (!g_window_list[i]->stick_to_back)
             {
                 dstIndex = i;
             }
@@ -120,7 +120,7 @@ rct_window* window_create(
     {
         for (size_t i = g_window_list.size(); i > 0; i--)
         {
-            if (!(g_window_list[i - 1]->flags & WF_STICK_TO_FRONT))
+            if (!g_window_list[i - 1]->stick_to_front)
             {
                 dstIndex = i;
                 break;
@@ -138,9 +138,9 @@ rct_window* window_create(
     w->flags = flags;
 
     // Play sounds and flash the window
-    if (!(flags & (WF_STICK_TO_BACK | WF_STICK_TO_FRONT)))
+    if (!w->stick_to_back && !w->stick_to_front)
     {
-        w->flags |= WF_WHITE_BORDER_MASK;
+        w->white_border_frames = 3;
         audio_play_sound(SOUND_WINDOW_OPEN, 0, x + (width / 2));
     }
 
@@ -224,7 +224,7 @@ rct_window* window_create_auto_pos(
     // Place window next to another
     for (auto& w : g_window_list)
     {
-        if (w->flags & WF_STICK_TO_BACK)
+        if (w->stick_to_back)
             continue;
 
         x = w->x + w->width + 2;
@@ -271,7 +271,7 @@ rct_window* window_create_auto_pos(
     // Overlap
     for (auto& w : g_window_list)
     {
-        if (w->flags & WF_STICK_TO_BACK)
+        if (w->stick_to_back)
             continue;
 
         x = w->x + w->width + 2;
@@ -638,7 +638,7 @@ void window_draw_widgets(rct_window* w, rct_drawpixelinfo* dpi)
     rct_widget* widget;
     rct_widgetindex widgetIndex;
 
-    if ((w->flags & WF_TRANSPARENT) && !(w->flags & WF_NO_BACKGROUND))
+    if (w->transparent && !w->no_background)
         gfx_filter_rect(dpi, w->x, w->y, w->x + w->width - 1, w->y + w->height - 1, PALETTE_51);
 
     // todo: some code missing here? Between 006EB18C and 006EB260
@@ -656,7 +656,7 @@ void window_draw_widgets(rct_window* w, rct_drawpixelinfo* dpi)
 
     // todo: something missing here too? Between 006EC32B and 006EC369
 
-    if (w->flags & WF_WHITE_BORDER_MASK)
+    if (w->white_border_frames > 0)
     {
         gfx_fill_rect_inset(
             dpi, w->x, w->y, w->x + w->width - 1, w->y + w->height - 1, COLOUR_WHITE, INSET_RECT_FLAG_FILL_NONE);

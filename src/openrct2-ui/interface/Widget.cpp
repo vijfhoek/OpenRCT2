@@ -121,8 +121,8 @@ static void widget_frame_draw(rct_drawpixelinfo* dpi, rct_window* w, rct_widgeti
     int32_t r = w->x + widget->right;
     int32_t b = w->y + widget->bottom;
 
-    //
-    uint8_t press = ((w->flags & WF_10) ? INSET_RECT_FLAG_FILL_MID_LIGHT : 0);
+    // ?
+    uint8_t press = w->unknown_10 ? INSET_RECT_FLAG_FILL_MID_LIGHT : 0;
 
     // Get the colour
     uint8_t colour = w->colours[widget->colour];
@@ -131,10 +131,10 @@ static void widget_frame_draw(rct_drawpixelinfo* dpi, rct_window* w, rct_widgeti
     gfx_fill_rect_inset(dpi, l, t, r, b, colour, press);
 
     // Check if the window can be resized
-    if (!(w->flags & WF_RESIZABLE))
+    if (!window_can_resize(w))
+    {
         return;
-    if (w->min_width == w->max_width && w->min_height == w->max_height)
-        return;
+    }
 
     // Draw the resize sprite at the bottom right corner
     l = w->x + widget->right - 18;
@@ -164,10 +164,10 @@ static void widget_resize_draw(rct_drawpixelinfo* dpi, rct_window* w, rct_widget
     gfx_fill_rect_inset(dpi, l, t, r, b, colour, 0);
 
     // Check if the window can be resized
-    if (!(w->flags & WF_RESIZABLE))
+    if (!window_can_resize(w))
+    {
         return;
-    if (w->min_width == w->max_width && w->min_height == w->max_height)
-        return;
+    }
 
     // Draw the resize sprite at the bottom right corner
     l = w->x + widget->right - 18;
@@ -504,7 +504,7 @@ static void widget_caption_draw(rct_drawpixelinfo* dpi, rct_window* w, rct_widge
     uint8_t colour = w->colours[widget->colour];
 
     uint8_t press = INSET_RECT_F_60;
-    if (w->flags & WF_10)
+    if (w->unknown_10)
         press |= INSET_RECT_FLAG_FILL_MID_LIGHT;
 
     gfx_fill_rect_inset(dpi, l, t, r, b, colour, press);
@@ -549,7 +549,7 @@ static void widget_closebox_draw(rct_drawpixelinfo* dpi, rct_window* w, rct_widg
 
     // Check if the button is pressed down
     uint8_t press = 0;
-    if (w->flags & WF_10)
+    if (w->unknown_10)
         press |= INSET_RECT_FLAG_FILL_MID_LIGHT;
     if (widget_is_pressed(w, widgetIndex) || widget_is_active_tool(w, widgetIndex))
         press |= INSET_RECT_FLAG_BORDER_INSET;

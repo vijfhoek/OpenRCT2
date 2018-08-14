@@ -486,7 +486,8 @@ rct_window* window_guest_open(rct_peep* peep)
     window = window_bring_to_front_by_number(WC_PEEP, peep->sprite_index);
     if (window == nullptr)
     {
-        window = window_create_auto_pos(192, 157, &window_guest_overview_events, WC_PEEP, WF_RESIZABLE);
+        window = window_create_auto_pos(192, 157, &window_guest_overview_events, WC_PEEP);
+        window->resizable = true;
         window->widgets = window_guest_overview_widgets;
         window->enabled_widgets = window_guest_page_enabled_widgets[0];
         window->number = peep->sprite_index;
@@ -801,8 +802,7 @@ void window_guest_viewport_init(rct_window* w)
             viewport_create(
                 w, x, y, width, height, 0, focus.coordinate.x, focus.coordinate.y & VIEWPORT_FOCUS_Y_MASK, focus.coordinate.z,
                 focus.sprite.type & VIEWPORT_FOCUS_TYPE_MASK, focus.sprite.sprite_id);
-
-            w->flags |= WF_NO_SCROLLING;
+            w->no_scrolling = true;
             window_invalidate(w);
         }
     }

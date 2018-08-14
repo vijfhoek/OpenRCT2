@@ -182,8 +182,8 @@ rct_window* window_scenarioselect_open(scenarioselect_callback callback, bool ti
         windowWidth = 733;
 
     window = window_create_centred(
-        windowWidth, windowHeight, &window_scenarioselect_events, WC_SCENARIO_SELECT,
-        WF_10 | (titleEditor ? WF_STICK_TO_FRONT : 0));
+        windowWidth, windowHeight, &window_scenarioselect_events, WC_SCENARIO_SELECT, titleEditor ? WF_STICK_TO_FRONT : 0);
+    window->unknown_10 = true;
     window->widgets = window_scenarioselect_widgets;
     window->enabled_widgets = (1 << WIDX_CLOSE) | (1 << WIDX_TAB1) | (1 << WIDX_TAB2) | (1 << WIDX_TAB3) | (1 << WIDX_TAB4)
         | (1 << WIDX_TAB5) | (1 << WIDX_TAB6) | (1 << WIDX_TAB7) | (1 << WIDX_TAB8);

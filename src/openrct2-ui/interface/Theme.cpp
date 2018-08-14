@@ -902,7 +902,8 @@ void colour_scheme_update_by_class(rct_window* window, rct_windowclass classific
     {
         window->colours[i] = windowTheme->Colours[i];
     }
+
     // Some windows need to be transparent even if the colours aren't.
     // There doesn't seem to be any side-effects for all windows being transparent
-    window->flags |= WF_TRANSPARENT;
+    window->transparent = true;
 }

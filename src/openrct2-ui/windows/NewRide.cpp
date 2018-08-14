@@ -482,7 +482,8 @@ rct_window* window_new_ride_open()
     window_close_by_class(WC_TRACK_DESIGN_LIST);
     window_close_by_class(WC_TRACK_DESIGN_PLACE);
 
-    w = window_create_auto_pos(WW, WH, &window_new_ride_events, WC_CONSTRUCT_RIDE, WF_10);
+    w = window_create_auto_pos(WW, WH, &window_new_ride_events, WC_CONSTRUCT_RIDE);
+    w->unknown_10 = true;
     w->widgets = window_new_ride_widgets;
     w->enabled_widgets = (1 << WIDX_CLOSE) | (1 << WIDX_TAB_1) | (1 << WIDX_TAB_2) | (1 << WIDX_TAB_3) | (1 << WIDX_TAB_4)
         | (1 << WIDX_TAB_5) | (1 << WIDX_TAB_6) | (1 << WIDX_TAB_7) | (1 << WIDX_LAST_DEVELOPMENT_BUTTON)

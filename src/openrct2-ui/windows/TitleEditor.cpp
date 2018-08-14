@@ -225,7 +225,9 @@ void window_title_editor_open(int32_t tab)
     if (_selectedTitleSequence == SIZE_MAX)
         _selectedTitleSequence = title_get_config_sequence();
 
-    window = window_create_auto_pos(WW, WH2, &window_title_editor_events, WC_TITLE_EDITOR, WF_10 | WF_RESIZABLE);
+    window = window_create_auto_pos(WW, WH2, &window_title_editor_events, WC_TITLE_EDITOR);
+    window->unknown_10 = true;
+    window->resizable = true;
     window->widgets = window_title_editor_widgets;
     window->enabled_widgets = (1 << WIDX_TITLE_EDITOR_CLOSE) | (1 << WIDX_TITLE_EDITOR_PRESETS_TAB)
         | (1 << WIDX_TITLE_EDITOR_SAVES_TAB) | (1 << WIDX_TITLE_EDITOR_SCRIPT_TAB) |

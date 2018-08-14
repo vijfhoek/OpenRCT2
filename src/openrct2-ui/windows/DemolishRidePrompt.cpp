@@ -130,13 +130,14 @@ rct_window* window_ride_demolish_prompt_open(int32_t rideIndex)
         int x = w->x;
         int y = w->y;
         window_close(w);
-        w = window_create(x, y, WW, WH, &window_ride_demolish_events, WC_DEMOLISH_RIDE_PROMPT, WF_TRANSPARENT);
+        w = window_create(x, y, WW, WH, &window_ride_demolish_events, WC_DEMOLISH_RIDE_PROMPT);
     }
     else
     {
-        w = window_create_centred(WW, WH, &window_ride_demolish_events, WC_DEMOLISH_RIDE_PROMPT, WF_TRANSPARENT);
+        w = window_create_centred(WW, WH, &window_ride_demolish_events, WC_DEMOLISH_RIDE_PROMPT);
     }
 
+    w->transparent = true;
     w->widgets = window_ride_demolish_widgets;
     w->enabled_widgets = (1 << WIDX_CLOSE) | (1 << WIDX_CANCEL) | (1 << WIDX_DEMOLISH);
     window_init_scroll_widgets(w);
@@ -156,13 +157,14 @@ rct_window* window_ride_refurbish_prompt_open(int32_t rideIndex)
         int x = w->x;
         int y = w->y;
         window_close(w);
-        w = window_create(x, y, WW, WH, &window_ride_refurbish_events, WC_DEMOLISH_RIDE_PROMPT, WF_TRANSPARENT);
+        w = window_create(x, y, WW, WH, &window_ride_refurbish_events, WC_DEMOLISH_RIDE_PROMPT);
     }
     else
     {
-        w = window_create_centred(WW, WH, &window_ride_refurbish_events, WC_DEMOLISH_RIDE_PROMPT, WF_TRANSPARENT);
+        w = window_create_centred(WW, WH, &window_ride_refurbish_events, WC_DEMOLISH_RIDE_PROMPT);
     }
 
+    w->transparent = true;
     w->widgets = window_ride_refurbish_widgets;
     w->enabled_widgets = (1 << WIDX_CLOSE) | (1 << WIDX_CANCEL) | (1 << WIDX_REFURBISH);
     window_init_scroll_widgets(w);

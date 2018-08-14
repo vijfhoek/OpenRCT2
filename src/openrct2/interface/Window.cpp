@@ -148,10 +148,10 @@ void window_update_all()
     for (auto it = g_window_list.rbegin(); it != g_window_list.rend(); it++)
     {
         auto w = it->get();
-        if (w->flags & WF_WHITE_BORDER_MASK)
+        if (w->white_border_frames > 0)
         {
-            w->flags -= WF_WHITE_BORDER_ONE;
-            if (!(w->flags & WF_WHITE_BORDER_MASK))
+            w->white_border_frames -= 1;
+            if (w->white_border_frames == 0)
             {
                 window_invalidate(w);
             }
@@ -174,7 +174,7 @@ static void window_close_surplus(int32_t cap, int8_t avoid_classification)
         rct_window* foundW{};
         for (auto& w : g_window_list)
         {
-            if (!(w->flags & (WF_STICK_TO_BACK | WF_STICK_TO_FRONT | WF_NO_AUTO_CLOSE)))
+            if (!w->stick_to_back && !w->stick_to_front && !w->no_auto_close)
             {
                 foundW = w.get();
                 break;
@@ -335,7 +335,7 @@ void window_close_top()
     for (auto it = g_window_list.rbegin(); it != g_window_list.rend(); it++)
     {
         auto& w = **it;
-        if (!(w.flags & (WF_STICK_TO_BACK | WF_STICK_TO_FRONT)))
+        if (!w.stick_to_back && !w.stick_to_front)
         {
             window_close(&w);
             break;
@@ -354,7 +354,7 @@ void window_close_all()
     for (size_t i = g_window_list.size(); i > 0; i--)
     {
         auto& w = *g_window_list[i - 1];
-        if (!(w.flags & (WF_STICK_TO_BACK | WF_STICK_TO_FRONT)))
+        if (!w.stick_to_back && !w.stick_to_front)
         {
             window_close(&w);
         }
@@ -367,7 +367,7 @@ void window_close_all_except_class(rct_windowclass cls)
     for (size_t i = g_window_list.size(); i > 0; i--)
     {
         auto& w = *g_window_list[i - 1];
-        if (w.classification != cls && !(w.flags & (WF_STICK_TO_BACK | WF_STICK_TO_FRONT)))
+        if (w.classification != cls && !w.stick_to_back && !w.stick_to_front)
         {
             window_close(&w);
         }
@@ -401,7 +401,7 @@ rct_window* window_find_from_point(int32_t x, int32_t y)
         if (x < w.x || x >= w.x + w.width || y < w.y || y >= w.y + w.height)
             continue;
 
-        if (w.flags & WF_NO_BACKGROUND)
+        if (w.no_background)
         {
             auto widgetIndex = window_find_widget_from_point(&w, x, y);
             if (widgetIndex == -1)
@@ -638,7 +638,7 @@ int32_t window_get_scroll_data_index(rct_window* w, rct_widgetindex widget_index
  */
 rct_window* window_bring_to_front(rct_window* w)
 {
-    if (!(w->flags & (WF_STICK_TO_BACK | WF_STICK_TO_FRONT)))
+    if (!w->stick_to_back && !w->stick_to_front)
     {
         size_t srcIndex = window_get_index(w);
         if (srcIndex != std::numeric_limits<size_t>::max())
@@ -651,7 +651,7 @@ rct_window* window_bring_to_front(rct_window* w)
             for (size_t i = g_window_list.size(); i > 0; i--)
             {
                 auto& w2 = *g_window_list[i - 1];
-                if (!(w2.flags & WF_STICK_TO_FRONT))
+                if (!w2.stick_to_front)
                 {
                     dstIndex = i;
                     break;
@@ -671,27 +671,25 @@ rct_window* window_bring_to_front(rct_window* w)
             }
         }
     }
+
     return w;
 }
 
-rct_window* window_bring_to_front_by_class_with_flags(rct_windowclass cls, uint16_t flags)
+rct_window* window_bring_to_front_by_class(rct_windowclass cls, bool flashBorder)
 {
-    rct_window* w;
-
-    w = window_find_by_class(cls);
+    rct_window* w = window_find_by_class(cls);
     if (w != nullptr)
     {
-        w->flags |= flags;
+        if (flashBorder)
+        {
+            w->white_border_frames = 3;
+        }
+
         window_invalidate(w);
         w = window_bring_to_front(w);
     }
 
     return w;
-}
-
-rct_window* window_bring_to_front_by_class(rct_windowclass cls)
-{
-    return window_bring_to_front_by_class_with_flags(cls, WF_WHITE_BORDER_MASK);
 }
 
 /**
@@ -707,7 +705,7 @@ rct_window* window_bring_to_front_by_number(rct_windowclass cls, rct_windownumbe
     w = window_find_by_number(cls, number);
     if (w != nullptr)
     {
-        w->flags |= WF_WHITE_BORDER_MASK;
+        w->white_border_frames = 3;
         window_invalidate(w);
         w = window_bring_to_front(w);
     }
@@ -725,7 +723,7 @@ void window_push_others_right(rct_window* window)
     {
         if (w.get() == window)
             continue;
-        if (w->flags & (WF_STICK_TO_BACK | WF_STICK_TO_FRONT))
+        if (w->stick_to_back || w->stick_to_front)
             continue;
         if (w->x >= window->x + window->width)
             continue;
@@ -761,8 +759,7 @@ void window_push_others_below(rct_window* w1)
         if (w1 == w2.get())
             continue;
 
-        // ?
-        if (w2->flags & (WF_STICK_TO_BACK | WF_STICK_TO_FRONT))
+        if (w2->stick_to_back || w2->stick_to_front)
             continue;
 
         // Check if w2 intersects with w1
@@ -841,7 +838,7 @@ void window_scroll_to_viewport(rct_window* w)
 void window_set_location(rct_window* w, int32_t x, int32_t y, int32_t z)
 {
     window_scroll_to_location(w, x, y, z);
-    w->flags &= ~WF_SCROLLING_TO_LOCATION;
+    w->scrolling_to_location = false;
 }
 
 /**
@@ -922,11 +919,11 @@ void window_scroll_to_location(rct_window* w, int32_t x, int32_t y, int32_t z)
         // rct2: 0x006E7C76
         if (w->viewport_target_sprite == SPRITE_INDEX_NULL)
         {
-            if (!(w->flags & WF_NO_SCROLLING))
+            if (!w->no_scrolling)
             {
                 w->saved_view_x = map_coordinate.x - (int16_t)(w->viewport->view_width * window_scroll_locations[i][0]);
                 w->saved_view_y = map_coordinate.y - (int16_t)(w->viewport->view_height * window_scroll_locations[i][1]);
-                w->flags |= WF_SCROLLING_TO_LOCATION;
+                w->scrolling_to_location = true;
             }
         }
     }
@@ -1131,33 +1128,37 @@ void main_window_zoom(bool zoomIn, bool atCursor)
  * right (dx)
  * bottom (bp)
  */
-void window_draw(rct_drawpixelinfo* dpi, rct_window* w, int32_t left, int32_t top, int32_t right, int32_t bottom)
+void window_draw(rct_drawpixelinfo* dpi, rct_window* window, int32_t left, int32_t top, int32_t right, int32_t bottom)
 {
-    if (!window_is_visible(w))
+    if (!window_is_visible(window))
+    {
         return;
+    }
 
     // Split window into only the regions that require drawing
-    if (window_draw_split(dpi, w, left, top, right, bottom))
+    if (window_draw_split(dpi, window, left, top, right, bottom))
+    {
         return;
+    }
 
     // Clamp region
-    left = std::max<int32_t>(left, w->x);
-    top = std::max<int32_t>(top, w->y);
-    right = std::min<int32_t>(right, w->x + w->width);
-    bottom = std::min<int32_t>(bottom, w->y + w->height);
-    if (left >= right)
-        return;
-    if (top >= bottom)
-        return;
+    left = std::max<int32_t>(left, window->x);
+    top = std::max<int32_t>(top, window->y);
+    right = std::min<int32_t>(right, window->x + window->width);
+    bottom = std::min<int32_t>(bottom, window->y + window->height);
 
-    // Draw the window in this region
-    for (size_t i = window_get_index(w); i < g_window_list.size(); i++)
+    if (left >= right || top >= bottom)
     {
-        // Don't draw overlapping opaque windows, they won't have changed
-        auto v = g_window_list[i].get();
-        if ((w == v || (v->flags & WF_TRANSPARENT)) && window_is_visible(v))
+        return;
+    }
+
+    // Redraw all transparent overlapping windows.
+    for (size_t windowIndex = window_get_index(window); windowIndex < g_window_list.size(); windowIndex++)
+    {
+        rct_window* w = g_window_list[windowIndex].get();
+        if ((window == w || w->transparent) && window_is_visible(w))
         {
-            window_draw_single(dpi, v, left, top, right, bottom);
+            window_draw_single(dpi, w, left, top, right, bottom);
         }
     }
 }
@@ -1178,7 +1179,7 @@ static int32_t window_draw_split(
             continue;
         if (topwindow->x + topwindow->width <= left || topwindow->y + topwindow->height <= top)
             continue;
-        if (topwindow->flags & WF_TRANSPARENT)
+        if (topwindow->transparent)
             continue;
 
         // A window overlaps w, split up the draw into two regions where the window starts to overlap
@@ -1626,7 +1627,7 @@ void window_relocate_windows(int32_t width, int32_t height)
         // Work out if the window requires moving
         if (w->x + 10 < width)
         {
-            if (w->flags & (WF_STICK_TO_BACK | WF_STICK_TO_FRONT))
+            if (w->stick_to_back || w->stick_to_front)
             {
                 if (w->y - 22 < height)
                 {
@@ -1972,7 +1973,7 @@ void window_move_and_snap(rct_window* w, int32_t newWindowX, int32_t newWindowY,
 
 int32_t window_can_resize(rct_window* w)
 {
-    return (w->flags & WF_RESIZABLE) && (w->min_width != w->max_width || w->min_height != w->max_height);
+    return w->resizable && (w->min_width != w->max_width || w->min_height != w->max_height);
 }
 
 /**
@@ -2109,7 +2110,7 @@ void window_draw_all(rct_drawpixelinfo* dpi, int16_t left, int16_t top, int16_t 
 
     for (auto& w : g_window_list)
     {
-        if (w->flags & WF_TRANSPARENT)
+        if (w->transparent)
             continue;
         if (right <= w->x || bottom <= w->y)
             continue;
