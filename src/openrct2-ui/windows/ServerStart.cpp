@@ -126,7 +126,7 @@ rct_window* window_server_start_open()
            | (1 << WIDX_LOAD_SERVER));
     window_init_scroll_widgets(window);
     window->no_list_items = 0;
-    window->selected_list_item = -1;
+    window->selected_list_item = {};
     window->frame_no = 0;
     window->min_width = window->width;
     window->min_height = window->height;

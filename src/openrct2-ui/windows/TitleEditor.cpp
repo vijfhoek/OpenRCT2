@@ -248,7 +248,7 @@ void window_title_editor_open(int32_t tab)
     window->list_information_type = 0;
 
     window->selected_tab = tab;
-    window->selected_list_item = -1;
+    window->selected_list_item = {};
     _window_title_editor_highlighted_index = -1;
     window->scrolls[0].v_top = 0;
     window->scrolls[0].h_left = 0;
@@ -338,12 +338,12 @@ static void window_title_editor_mouseup(rct_window* w, rct_widgetindex widgetInd
         case WIDX_TITLE_EDITOR_REMOVE_SAVE:
             if (window_title_editor_check_can_edit())
             {
-                if (w->selected_list_item != -1)
+                if (w->selected_list_item)
                 {
-                    TitleSequenceRemovePark(_editingTitleSequence, w->selected_list_item);
-                    if (w->selected_list_item >= (int16_t)_editingTitleSequence->NumSaves)
+                    TitleSequenceRemovePark(_editingTitleSequence, *w->selected_list_item);
+                    if (*w->selected_list_item >= (int16_t)_editingTitleSequence->NumSaves)
                     {
-                        w->selected_list_item--;
+                        *w->selected_list_item -= 1;
                     }
                 }
             }
@@ -351,18 +351,18 @@ static void window_title_editor_mouseup(rct_window* w, rct_widgetindex widgetInd
         case WIDX_TITLE_EDITOR_RENAME_SAVE:
             if (window_title_editor_check_can_edit())
             {
-                if (w->selected_list_item != -1)
+                if (w->selected_list_item)
                 {
                     window_text_input_open(
                         w, widgetIndex, STR_FILEBROWSER_RENAME_SAVE_TITLE, STR_TITLE_EDITOR_ENTER_NAME_FOR_SAVE, STR_STRING,
-                        (uintptr_t)_editingTitleSequence->Saves[w->selected_list_item], 52 - 1);
+                        (uintptr_t)_editingTitleSequence->Saves[*w->selected_list_item], 52 - 1);
                 }
             }
             break;
         case WIDX_TITLE_EDITOR_LOAD_SAVE:
-            if (w->selected_list_item >= 0 && w->selected_list_item < (int16_t)_editingTitleSequence->NumSaves)
+            if (w->selected_list_item && *w->selected_list_item < (int16_t)_editingTitleSequence->NumSaves)
             {
-                auto handle = TitleSequenceGetParkHandle(_editingTitleSequence, w->selected_list_item);
+                auto handle = TitleSequenceGetParkHandle(_editingTitleSequence, *w->selected_list_item);
                 auto stream = (IStream*)handle->Stream;
                 auto hintPath = String::ToStd(handle->HintPath);
 
@@ -389,34 +389,33 @@ static void window_title_editor_mouseup(rct_window* w, rct_widgetindex widgetInd
         case WIDX_TITLE_EDITOR_INSERT:
             if (window_title_editor_check_can_edit())
             {
-                if (w->selected_list_item != -1)
-                    window_title_command_editor_open(_editingTitleSequence, w->selected_list_item + 1, true);
-                else
-                    window_title_command_editor_open(_editingTitleSequence, (int32_t)_editingTitleSequence->NumCommands, true);
+                int32_t item = w->selected_list_item ? (*w->selected_list_item + 1)
+                                                     : (int32_t)_editingTitleSequence->NumCommands;
+                window_title_command_editor_open(_editingTitleSequence, item, true);
             }
             break;
         case WIDX_TITLE_EDITOR_EDIT:
             if (window_title_editor_check_can_edit())
             {
-                if (w->selected_list_item != -1 && w->selected_list_item < (int16_t)_editingTitleSequence->NumCommands)
+                if (w->selected_list_item && *w->selected_list_item < (int16_t)_editingTitleSequence->NumCommands)
                 {
-                    window_title_command_editor_open(_editingTitleSequence, w->selected_list_item, false);
+                    window_title_command_editor_open(_editingTitleSequence, *w->selected_list_item, false);
                 }
             }
             break;
         case WIDX_TITLE_EDITOR_DELETE:
             if (window_title_editor_check_can_edit())
             {
-                if (w->selected_list_item != -1 && w->selected_list_item < (int16_t)_editingTitleSequence->NumCommands)
+                if (w->selected_list_item && *w->selected_list_item < (int16_t)_editingTitleSequence->NumCommands)
                 {
-                    for (int32_t i = w->selected_list_item; i < (int16_t)_editingTitleSequence->NumCommands - 1; i++)
+                    for (int32_t i = *w->selected_list_item; i < (int16_t)_editingTitleSequence->NumCommands - 1; i++)
                     {
                         _editingTitleSequence->Commands[i] = _editingTitleSequence->Commands[i + 1];
                     }
                     _editingTitleSequence->NumCommands--;
-                    if (w->selected_list_item >= (int16_t)_editingTitleSequence->NumCommands)
+                    if (*w->selected_list_item >= (int16_t)_editingTitleSequence->NumCommands)
                     {
-                        w->selected_list_item--;
+                        *w->selected_list_item -= 1;
                     }
                     TitleSequenceSave(_editingTitleSequence);
                 }
@@ -424,11 +423,11 @@ static void window_title_editor_mouseup(rct_window* w, rct_widgetindex widgetInd
             break;
         case WIDX_TITLE_EDITOR_SKIP_TO:
         {
-            int32_t position = w->selected_list_item;
-            if (title_is_previewing_sequence() && position != -1 && position < (int32_t)_editingTitleSequence->NumCommands)
+            if (w->selected_list_item && title_is_previewing_sequence()
+                && *w->selected_list_item < (int32_t)_editingTitleSequence->NumCommands)
             {
                 auto player = window_title_editor_get_player();
-                player->Seek(position);
+                player->Seek(*w->selected_list_item);
                 player->Update();
             }
             break;
@@ -436,14 +435,16 @@ static void window_title_editor_mouseup(rct_window* w, rct_widgetindex widgetInd
         case WIDX_TITLE_EDITOR_MOVE_DOWN:
             if (window_title_editor_check_can_edit())
             {
-                if (w->selected_list_item != -1 && w->selected_list_item < (int16_t)_editingTitleSequence->NumCommands - 1)
+                if (w->selected_list_item && *w->selected_list_item < (int16_t)_editingTitleSequence->NumCommands - 1)
                 {
-                    TitleCommand* a = &_editingTitleSequence->Commands[w->selected_list_item];
-                    TitleCommand* b = &_editingTitleSequence->Commands[w->selected_list_item + 1];
+                    TitleCommand* a = &_editingTitleSequence->Commands[*w->selected_list_item];
+                    TitleCommand* b = &_editingTitleSequence->Commands[*w->selected_list_item + 1];
+
                     TitleCommand tmp = *a;
                     *a = *b;
                     *b = tmp;
-                    w->selected_list_item++;
+
+                    *w->selected_list_item += 1;
                     TitleSequenceSave(_editingTitleSequence);
                 }
             }
@@ -451,14 +452,14 @@ static void window_title_editor_mouseup(rct_window* w, rct_widgetindex widgetInd
         case WIDX_TITLE_EDITOR_MOVE_UP:
             if (window_title_editor_check_can_edit())
             {
-                if (w->selected_list_item > 0 && w->selected_list_item < (int16_t)_editingTitleSequence->NumCommands)
+                if (w->selected_list_item && *w->selected_list_item < (int16_t)_editingTitleSequence->NumCommands)
                 {
-                    TitleCommand* a = &_editingTitleSequence->Commands[w->selected_list_item - 1];
-                    TitleCommand* b = &_editingTitleSequence->Commands[w->selected_list_item];
+                    TitleCommand* a = &_editingTitleSequence->Commands[*w->selected_list_item - 1];
+                    TitleCommand* b = &_editingTitleSequence->Commands[*w->selected_list_item];
                     TitleCommand tmp = *b;
                     *b = *a;
                     *a = tmp;
-                    w->selected_list_item--;
+                    *w->selected_list_item -= 1;
                     TitleSequenceSave(_editingTitleSequence);
                 }
             }
@@ -526,7 +527,7 @@ static void window_title_editor_mousedown(rct_window* w, rct_widgetindex widgetI
             if (w->selected_tab != newSelectedTab)
             {
                 w->selected_tab = newSelectedTab;
-                w->selected_list_item = -1;
+                w->selected_list_item = {};
                 _window_title_editor_highlighted_index = -1;
                 w->scrolls[0].v_top = 0;
                 w->frame_no = 0;
@@ -615,7 +616,7 @@ static void window_title_editor_scrollgetsize(rct_window* w, int32_t scrollIndex
 static void window_title_editor_scrollmousedown(rct_window* w, int32_t scrollIndex, int32_t x, int32_t y)
 {
     int32_t index = y / SCROLLABLE_ROW_HEIGHT;
-    w->selected_list_item = -1;
+    w->selected_list_item = {};
     switch (w->selected_tab)
     {
         case WINDOW_TITLE_EDITOR_TAB_SAVES:
@@ -702,7 +703,7 @@ static void window_title_editor_textinput(rct_window* w, rct_widgetindex widgetI
             }
             break;
         case WIDX_TITLE_EDITOR_RENAME_SAVE:
-            window_title_editor_rename_park(w->selected_list_item, text);
+            window_title_editor_rename_park(w->selected_list_item.value_or(-1), text);
             break;
     }
 }

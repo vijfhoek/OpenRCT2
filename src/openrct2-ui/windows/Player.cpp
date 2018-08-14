@@ -201,7 +201,7 @@ rct_window* window_player_open(uint8_t id)
         window->max_width = 500;
         window->max_height = 450;
         window->no_list_items = 0;
-        window->selected_list_item = -1;
+        window->selected_list_item = {};
 
         window->viewport_focus_coordinates.y = -1;
     }
@@ -541,7 +541,7 @@ static void window_player_set_page(rct_window* w, int32_t page)
     w->page = page;
     w->frame_no = 0;
     w->no_list_items = 0;
-    w->selected_list_item = -1;
+    w->selected_list_item = {};
 
     w->enabled_widgets = window_player_page_enabled_widgets[page];
     w->hold_down_widgets = 0;

@@ -502,7 +502,7 @@ rct_window* window_guest_open(rct_peep* peep)
         window->max_width = 500;
         window->max_height = 450;
         window->no_list_items = 0;
-        window->selected_list_item = -1;
+        window->selected_list_item = {};
 
         window->viewport_focus_coordinates.y = -1;
     }
@@ -662,7 +662,7 @@ void window_guest_set_page(rct_window* w, int32_t page)
     w->page = page;
     w->frame_no = 0;
     w->no_list_items = 0;
-    w->selected_list_item = -1;
+    w->selected_list_item = {};
 
     rct_viewport* viewport = w->viewport;
     w->viewport = nullptr;
@@ -1628,9 +1628,9 @@ void window_guest_rides_scroll_get_size(rct_window* w, int32_t scrollIndex, int3
 {
     *height = w->no_list_items * 10;
 
-    if (w->selected_list_item != -1)
+    if (w->selected_list_item)
     {
-        w->selected_list_item = -1;
+        w->selected_list_item = {};
         window_invalidate(w);
     }
 
@@ -1670,16 +1670,13 @@ void window_guest_rides_scroll_mouse_down(rct_window* w, int32_t scrollIndex, in
  */
 void window_guest_rides_scroll_mouse_over(rct_window* w, int32_t scrollIndex, int32_t x, int32_t y)
 {
-    int32_t index;
-
-    index = y / 10;
-    if (index >= w->no_list_items)
+    int32_t index = y / 10;
+    if (index >= w->no_list_items || index == w->selected_list_item)
+    {
         return;
+    }
 
-    if (index == w->selected_list_item)
-        return;
     w->selected_list_item = index;
-
     window_invalidate(w);
 }
 

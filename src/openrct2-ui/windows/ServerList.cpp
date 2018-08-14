@@ -156,7 +156,7 @@ rct_window* window_server_list_open()
            | (1 << WIDX_START_SERVER));
     window_init_scroll_widgets(window);
     window->no_list_items = 0;
-    window->selected_list_item = -1;
+    window->selected_list_item = {};
     window->frame_no = 0;
     window->min_width = 320;
     window->min_height = 90;
@@ -198,10 +198,9 @@ static void window_server_list_mouseup(rct_window* w, rct_widgetindex widgetInde
             break;
         case WIDX_LIST:
         {
-            int32_t serverIndex = w->selected_list_item;
-            if (serverIndex >= 0 && serverIndex < (int32_t)_serverEntries.size())
+            if (w->selected_list_item && *w->selected_list_item < _serverEntries.size())
             {
-                const auto& server = _serverEntries[serverIndex];
+                const auto& server = _serverEntries[*w->selected_list_item];
                 if (is_version_valid(server.version))
                 {
                     join_server(server.address);
@@ -235,10 +234,9 @@ static void window_server_list_resize(rct_window* w)
 
 static void window_server_list_dropdown(rct_window* w, rct_widgetindex widgetIndex, int32_t dropdownIndex)
 {
-    auto serverIndex = w->selected_list_item;
-    if (serverIndex >= 0 && serverIndex < (int32_t)_serverEntries.size())
+    if (w->selected_list_item && *w->selected_list_item < (int32_t)_serverEntries.size())
     {
-        auto& server = _serverEntries[serverIndex];
+        auto& server = _serverEntries[*w->selected_list_item];
         switch (dropdownIndex)
         {
             case DDIDX_JOIN:
@@ -248,7 +246,7 @@ static void window_server_list_dropdown(rct_window* w, rct_widgetindex widgetInd
                 }
                 else
                 {
-                    set_format_arg(0, void*, _serverEntries[serverIndex].version.c_str());
+                    set_format_arg(0, void*, _serverEntries[*w->selected_list_item].version.c_str());
                     context_show_error(STR_UNABLE_TO_CONNECT_TO_SERVER, STR_MULTIPLAYER_INCORRECT_SOFTWARE_VERSION);
                 }
                 break;
@@ -280,18 +278,17 @@ static void window_server_list_scroll_getsize(rct_window* w, int32_t scrollIndex
 
 static void window_server_list_scroll_mousedown(rct_window* w, int32_t scrollIndex, int32_t x, int32_t y)
 {
-    int32_t serverIndex = w->selected_list_item;
-    if (serverIndex < 0)
+    if (!w->selected_list_item || *w->selected_list_item >= (int32_t)_serverEntries.size())
+    {
         return;
-    if (serverIndex >= (int32_t)_serverEntries.size())
-        return;
+    }
 
     rct_widget* listWidget = &w->widgets[WIDX_LIST];
     int32_t ddx = w->x + listWidget->left + x + 2 - w->scrolls[0].h_left;
     int32_t ddy = w->y + listWidget->top + y + 2 - w->scrolls[0].v_top;
 
     gDropdownItemsFormat[0] = STR_JOIN_GAME;
-    if (_serverEntries[serverIndex].favourite)
+    if (_serverEntries[*w->selected_list_item].favourite)
     {
         gDropdownItemsFormat[1] = STR_REMOVE_FROM_FAVOURITES;
     }
@@ -452,7 +449,7 @@ static void window_server_list_scrollpaint(rct_window* w, rct_drawpixelinfo* dpi
         // if (y + ITEM_HEIGHT < dpi->y) continue;
 
         server_entry* serverDetails = &_serverEntries[i];
-        bool highlighted = i == w->selected_list_item;
+        bool highlighted = (i == w->selected_list_item);
 
         // Draw hover highlight
         if (highlighted)

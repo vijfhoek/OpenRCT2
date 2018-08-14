@@ -320,7 +320,7 @@ static void window_multiplayer_set_page(rct_window* w, int32_t page)
     w->page = page;
     w->frame_no = 0;
     w->no_list_items = 0;
-    w->selected_list_item = -1;
+    w->selected_list_item = {};
 
     w->enabled_widgets = window_multiplayer_page_enabled_widgets[page];
     w->hold_down_widgets = 0;
@@ -530,7 +530,7 @@ static void window_multiplayer_players_resize(rct_window* w)
 
     w->widgets[WIDX_HEADER_PING].right = w->width - 5;
 
-    w->selected_list_item = -1;
+    w->selected_list_item = {};
     window_invalidate(w);
 }
 
@@ -544,9 +544,9 @@ static void window_multiplayer_players_scrollgetsize(rct_window* w, int32_t scro
 {
     int32_t i;
 
-    if (w->selected_list_item != -1)
+    if (w->selected_list_item)
     {
-        w->selected_list_item = -1;
+        w->selected_list_item = {};
         window_invalidate(w);
     }
 
@@ -732,7 +732,7 @@ static void window_multiplayer_groups_resize(rct_window* w)
     w->no_list_items = network_get_num_actions();
     w->list_item_positions[0] = 0;
 
-    w->selected_list_item = -1;
+    w->selected_list_item = {};
     window_invalidate(w);
 }
 
@@ -781,9 +781,9 @@ static void window_multiplayer_groups_scrollgetsize(rct_window* w, int32_t scrol
 {
     int32_t i;
 
-    if (w->selected_list_item != -1)
+    if (w->selected_list_item)
     {
-        w->selected_list_item = -1;
+        w->selected_list_item = {};
         window_invalidate(w);
     }
 

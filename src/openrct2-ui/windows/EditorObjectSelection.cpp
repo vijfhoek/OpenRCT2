@@ -293,7 +293,7 @@ static void visible_list_refresh(rct_window* w)
     int32_t numObjects = (int32_t)object_repository_get_items_count();
 
     visible_list_dispose();
-    w->selected_list_item = -1;
+    w->selected_list_item = {};
 
     const ObjectRepositoryItem* items = object_repository_get_items();
     for (int32_t i = 0; i < numObjects; i++)
@@ -398,7 +398,7 @@ rct_window* window_editor_object_selection_open()
 
     window->var_4AE = 0;
     window->selected_tab = 0;
-    window->selected_list_item = -1;
+    window->selected_list_item = {};
     window->object_entry = nullptr;
     window->min_width = 600;
     window->min_height = 400;
@@ -475,7 +475,7 @@ static void window_editor_object_selection_mouseup(rct_window* w, rct_widgetinde
             filter_update_counts();
             visible_list_refresh(w);
 
-            w->selected_list_item = -1;
+            w->selected_list_item = {};
             w->object_entry = nullptr;
             w->scrolls[0].v_top = 0;
             window_invalidate(w);
@@ -494,7 +494,7 @@ static void window_editor_object_selection_mouseup(rct_window* w, rct_widgetinde
             filter_update_counts();
             visible_list_refresh(w);
 
-            w->selected_list_item = -1;
+            w->selected_list_item = {};
             w->object_entry = nullptr;
             w->scrolls[0].v_top = 0;
             w->frame_no = 0;
@@ -508,10 +508,7 @@ static void window_editor_object_selection_mouseup(rct_window* w, rct_widgetinde
 
         case WIDX_INSTALL_TRACK:
         {
-            if (w->selected_list_item != -1)
-            {
-                w->selected_list_item = -1;
-            }
+            w->selected_list_item = {};
             window_invalidate(w);
 
             auto intent = Intent(WC_LOADSAVE);
@@ -750,19 +747,20 @@ static void window_editor_object_selection_scroll_mouseover(rct_window* w, int32
             selectedObject = -1;
         }
     }
-    if (selectedObject != w->selected_list_item)
-    {
-        w->selected_list_item = selectedObject;
 
+    if (selectedObject != w->selected_list_item.value_or(-1))
+    {
         object_delete(_loadedObject);
         _loadedObject = nullptr;
 
         if (selectedObject == -1)
         {
+            w->selected_list_item = {};
             w->object_entry = nullptr;
         }
         else
         {
+            w->selected_list_item = selectedObject;
             auto listItem = &_listItems[selectedObject];
             w->object_entry = listItem->entry;
             _loadedObject = object_repository_load_object(listItem->entry);
@@ -1033,10 +1031,10 @@ static void window_editor_object_selection_paint(rct_window* w, rct_drawpixelinf
             widget->right - widget->left);
     }
 
-    if (w->selected_list_item == -1 || _loadedObject == nullptr)
+    if (!w->selected_list_item || _loadedObject == nullptr)
         return;
 
-    list_item* listItem = &_listItems[w->selected_list_item];
+    list_item* listItem = &_listItems[*w->selected_list_item];
 
     // Draw preview
     widget = &w->widgets[WIDX_PREVIEW];
@@ -1187,7 +1185,7 @@ static void window_editor_object_set_page(rct_window* w, int32_t page)
         return;
 
     w->selected_tab = page;
-    w->selected_list_item = -1;
+    w->selected_list_item = {};
     w->object_entry = nullptr;
     w->scrolls[0].v_top = 0;
     w->frame_no = 0;

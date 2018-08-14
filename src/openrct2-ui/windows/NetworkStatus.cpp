@@ -90,7 +90,7 @@ rct_window* window_network_status_open(const char* text, close_callback onClose)
     window->enabled_widgets = 1 << WIDX_CLOSE;
     window_init_scroll_widgets(window);
     window->no_list_items = 0;
-    window->selected_list_item = -1;
+    window->selected_list_item = {};
     window->frame_no = 0;
     window->min_width = 320;
     window->min_height = 90;

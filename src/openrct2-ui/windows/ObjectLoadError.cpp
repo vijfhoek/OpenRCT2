@@ -234,9 +234,9 @@ static void window_object_load_error_mouseup(rct_window* w, rct_widgetindex widg
             window_close(w);
             break;
         case WIDX_COPY_CURRENT:
-            if (w->selected_list_item > -1 && w->selected_list_item < w->no_list_items)
+            if (w->selected_list_item && w->selected_list_item < w->no_list_items)
             {
-                utf8* selected_name = strndup(_invalid_entries[w->selected_list_item].name, 8);
+                utf8* selected_name = strndup(_invalid_entries[*w->selected_list_item].name, 8);
                 utf8* strp = strchr(selected_name, ' ');
                 if (strp != nullptr)
                     *strp = '\0';
@@ -268,7 +268,7 @@ static void window_object_load_error_select_element_from_list(rct_window* w, int
 {
     if (index < 0 || index > w->no_list_items)
     {
-        w->selected_list_item = -1;
+        w->selected_list_item = {};
     }
     else
     {

@@ -270,7 +270,7 @@ rct_window* window_editor_objective_options_open()
     w->var_4AE = 0;
     w->selected_tab = WINDOW_EDITOR_OBJECTIVE_OPTIONS_PAGE_MAIN;
     w->no_list_items = 0;
-    w->selected_list_item = -1;
+    w->selected_list_item = {};
     window_editor_objective_options_update_disabled_widgets(w);
 
     return w;
@@ -334,7 +334,7 @@ static void window_editor_objective_options_set_page(rct_window* w, int32_t page
     w->frame_no = 0;
     w->var_492 = 0;
     w->no_list_items = 0;
-    w->selected_list_item = -1;
+    w->selected_list_item = {};
     w->enabled_widgets = window_editor_objective_options_page_enabled_widgets[page];
     w->hold_down_widgets = window_editor_objective_options_page_hold_down_widgets[page];
     w->event_handlers = window_editor_objective_options_page_events[page];
@@ -1157,9 +1157,11 @@ static void window_editor_objective_options_rides_scrollmouseover(rct_window* w,
 
     i = y / 12;
     if (i < 0 || i >= w->no_list_items)
+    {
         return;
+    }
 
-    if (w->selected_list_item != i)
+    if (!w->selected_list_item || *w->selected_list_item != i)
     {
         w->selected_list_item = i;
         window_invalidate(w);

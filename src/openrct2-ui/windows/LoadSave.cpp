@@ -208,7 +208,7 @@ rct_window* window_loadsave_open(int32_t type, const char* defaultName)
     }
 
     w->no_list_items = 0;
-    w->selected_list_item = -1;
+    w->selected_list_item = {};
 
     bool isSave = (type & 0x01) == LOADSAVETYPE_SAVE;
     bool success = false;
@@ -504,7 +504,7 @@ static void window_loadsave_scrollmousedown(rct_window* w, int32_t scrollIndex, 
         int32_t includeNewItem;
 
         w->no_list_items = 0;
-        w->selected_list_item = -1;
+        w->selected_list_item = {};
         includeNewItem = (_type & 1) == LOADSAVETYPE_SAVE;
 
         char directory[MAX_PATH];
@@ -566,7 +566,7 @@ static void window_loadsave_textinput(rct_window* w, rct_widgetindex widgetIndex
             }
 
             w->no_list_items = 0;
-            w->selected_list_item = -1;
+            w->selected_list_item = {};
 
             window_loadsave_populate_list(w, (_type & 1) == LOADSAVETYPE_SAVE, path, _extension);
             window_init_scroll_widgets(w);

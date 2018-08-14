@@ -167,7 +167,7 @@ rct_window* window_shortcut_keys_open()
         window_init_scroll_widgets(w);
 
         w->no_list_items = SHORTCUT_COUNT;
-        w->selected_list_item = -1;
+        w->selected_list_item = {};
         w->min_width = WW;
         w->min_height = WH;
         w->max_width = WW_SC_MAX;

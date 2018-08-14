@@ -337,14 +337,16 @@ static void window_track_list_mouseup(rct_window* w, rct_widgetindex widgetIndex
             break;
         case WIDX_FILTER_CLEAR:
             // Keep the highlighted item selected
-            if (gScreenFlags & SCREEN_FLAGS_TRACK_MANAGER)
+            if (w->selected_list_item)
             {
-                w->selected_list_item = _filteredTrackIds[w->selected_list_item];
-            }
-            else
-            {
-                if (w->selected_list_item != 0)
-                    w->selected_list_item = _filteredTrackIds[w->selected_list_item - 1] + 1;
+                if (gScreenFlags & SCREEN_FLAGS_TRACK_MANAGER)
+                {
+                    w->selected_list_item = _filteredTrackIds[*w->selected_list_item];
+                }
+                else
+                {
+                    w->selected_list_item = _filteredTrackIds[*w->selected_list_item - 1] + 1;
+                }
             }
 
             String::Set(_filterString, sizeof(_filterString), "");
@@ -395,7 +397,7 @@ static void window_track_list_scrollmouseover(rct_window* w, int32_t scrollIndex
     if (!w->track_list.track_list_being_updated)
     {
         int32_t i = window_track_list_get_list_item_index_from_position(x, y);
-        if (i != -1 && w->selected_list_item != i)
+        if (i != -1 && w->selected_list_item && w->selected_list_item != i)
         {
             w->selected_list_item = i;
             window_invalidate(w);
@@ -464,7 +466,7 @@ static void window_track_list_invalidate(rct_window* w)
         window_track_list_widgets[WIDX_TRACK_LIST].tooltip = STR_CLICK_ON_DESIGN_TO_BUILD_IT_TIP;
     }
 
-    if ((gScreenFlags & SCREEN_FLAGS_TRACK_MANAGER) || w->selected_list_item != 0)
+    if ((gScreenFlags & SCREEN_FLAGS_TRACK_MANAGER) || (w->selected_list_item && w->selected_list_item != 0))
     {
         w->pressed_widgets |= 1 << WIDX_TRACK_PREVIEW;
         w->disabled_widgets &= ~(1 << WIDX_TRACK_PREVIEW);
@@ -496,11 +498,15 @@ static void window_track_list_paint(rct_window* w, rct_drawpixelinfo* dpi)
 {
     window_draw_widgets(w, dpi);
 
-    int32_t listItemIndex = w->selected_list_item;
-    if (gScreenFlags & SCREEN_FLAGS_TRACK_MANAGER)
+    if (!w->selected_list_item)
     {
-        if (_trackDesigns.size() == 0 || listItemIndex == -1)
-            return;
+        return;
+    }
+
+    uint32_t listItemIndex = *w->selected_list_item;
+    if (gScreenFlags & SCREEN_FLAGS_TRACK_MANAGER && _trackDesigns.size() == 0)
+    {
+        return;
     }
     else
     {
@@ -715,7 +721,7 @@ static void window_track_list_scrollpaint(rct_window* w, rct_drawpixelinfo* dpi,
 
     int32_t x = 0;
     int32_t y = 0;
-    size_t listIndex = 0;
+    uint16_t listIndex = 0;
     if (gScreenFlags & SCREEN_FLAGS_TRACK_MANAGER)
     {
         if (_trackDesigns.size() == 0)
@@ -729,7 +735,7 @@ static void window_track_list_scrollpaint(rct_window* w, rct_drawpixelinfo* dpi,
     {
         // Build custom track item
         rct_string_id stringId;
-        if (listIndex == (size_t)w->selected_list_item)
+        if (listIndex == w->selected_list_item)
         {
             // Highlight
             gfx_filter_rect(dpi, x, y, w->width, y + SCROLLABLE_ROW_HEIGHT - 1, PALETTE_DARKEN_1);
@@ -751,7 +757,7 @@ static void window_track_list_scrollpaint(rct_window* w, rct_drawpixelinfo* dpi,
         if (y + SCROLLABLE_ROW_HEIGHT >= dpi->y && y < dpi->y + dpi->height)
         {
             rct_string_id stringId;
-            if (listIndex == (size_t)w->selected_list_item)
+            if (listIndex == w->selected_list_item)
             {
                 // Highlight
                 gfx_filter_rect(dpi, x, y, w->width, y + SCROLLABLE_ROW_HEIGHT - 1, PALETTE_DARKEN_1);

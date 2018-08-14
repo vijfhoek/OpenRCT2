@@ -12,6 +12,7 @@
 #include "Window.h"
 
 #include <memory>
+#include <optional>
 #include <vector>
 
 struct rct_research_item;
@@ -44,7 +45,7 @@ struct rct_window
     uint8_t list_item_positions[1024];     // 0x076
     uint16_t no_list_items;                // 0x476 0 for no items
     int16_t pad_478;
-    int16_t selected_list_item; // 0x47A -1 for none selected
+    std::optional<uint16_t> selected_list_item; // 0x47A
     int16_t pad_47C;
     int16_t pad_47E;
     union
