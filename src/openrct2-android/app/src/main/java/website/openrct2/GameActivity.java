@@ -15,7 +15,7 @@ public class GameActivity extends SDLActivity {
                 "speexdsp",
                 "jansson",
                 "png16",
-                "SDL2-2.0",
+                "SDL2",
 
                 "openrct2",
                 "openrct2-ui"

@@ -9,6 +9,8 @@ file(MAKE_DIRECTORY ${lib_build_DIR})
 set(DEBUG_LEVEL 0 CACHE STRING "Select debug level for compilation. Use value in range 0–3.")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DDEBUG=${DEBUG_LEVEL}")
 
+get_filename_component(ORCT2_ROOT "${CMAKE_SOURCE_DIR}/../../../../../" REALPATH)
+
 # Copied from https://github.com/opencv/opencv/blob/dcdd6af5a856826fe62c95322145731e702e54c5/cmake/OpenCVDetectCXXCompiler.cmake#L63-L70
 if(MSVC64 OR MINGW64)
     set(X86_64 1)
@@ -34,8 +36,7 @@ ExternalProject_Add(libs
         ${CMAKE_BINARY_DIR}/libs/lib/${CMAKE_SHARED_LIBRARY_PREFIX}freetype${CMAKE_SHARED_LIBRARY_SUFFIX}
         ${CMAKE_BINARY_DIR}/libs/lib/${CMAKE_SHARED_LIBRARY_PREFIX}jansson${CMAKE_SHARED_LIBRARY_SUFFIX}
         ${CMAKE_BINARY_DIR}/libs/lib/${CMAKE_SHARED_LIBRARY_PREFIX}png16${CMAKE_SHARED_LIBRARY_SUFFIX}
-        ${CMAKE_BINARY_DIR}/libs/lib/${CMAKE_SHARED_LIBRARY_PREFIX}SDL2-2.0${CMAKE_SHARED_LIBRARY_SUFFIX}
-        ${CMAKE_BINARY_DIR}/libs/lib/${CMAKE_STATIC_LIBRARY_PREFIX}SDL2main${CMAKE_STATIC_LIBRARY_SUFFIX}
+        #${CMAKE_BINARY_DIR}/libs/lib/${CMAKE_SHARED_LIBRARY_PREFIX}SDL2${CMAKE_SHARED_LIBRARY_SUFFIX}
         ${CMAKE_BINARY_DIR}/libs/lib/${CMAKE_SHARED_LIBRARY_PREFIX}speexdsp${CMAKE_SHARED_LIBRARY_SUFFIX}
         ${CMAKE_BINARY_DIR}/libs/lib/${CMAKE_STATIC_LIBRARY_PREFIX}icui18n${CMAKE_STATIC_LIBRARY_SUFFIX}
         ${CMAKE_BINARY_DIR}/libs/lib/${CMAKE_STATIC_LIBRARY_PREFIX}icuuc${CMAKE_STATIC_LIBRARY_SUFFIX}
@@ -54,6 +55,7 @@ ExternalProject_Add(libs
 add_custom_command(TARGET libs POST_BUILD
     COMMAND ${CMAKE_COMMAND} -E make_directory ${CMAKE_LIBRARY_OUTPUT_DIRECTORY}
     COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_BINARY_DIR}/libs/lib/*.so" ${CMAKE_LIBRARY_OUTPUT_DIRECTORY}
+    COMMAND ${CMAKE_COMMAND} -E copy "${ORCT2_ROOT}/src/openrct2-android/libs/*.so" ${CMAKE_LIBRARY_OUTPUT_DIRECTORY}
 )
 
 add_library(freetype SHARED IMPORTED)
@@ -76,15 +78,10 @@ add_dependencies(png libs)
 
 add_library(SDL2 SHARED IMPORTED)
 set_target_properties(SDL2 PROPERTIES IMPORTED_LOCATION
-    ${CMAKE_BINARY_DIR}/libs/lib/${CMAKE_SHARED_LIBRARY_PREFIX}SDL2-2.0${CMAKE_SHARED_LIBRARY_SUFFIX}
+    #${CMAKE_BINARY_DIR}/libs/lib/${CMAKE_SHARED_LIBRARY_PREFIX}SDL2${CMAKE_SHARED_LIBRARY_SUFFIX}
+    ${ORCT2_ROOT}/src/openrct2-android/libs/libSDL2.so
 )
 add_dependencies(SDL2 libs)
-
-add_library(SDL2main STATIC IMPORTED)
-set_target_properties(SDL2main PROPERTIES IMPORTED_LOCATION
-    ${CMAKE_BINARY_DIR}/libs/lib/${CMAKE_STATIC_LIBRARY_PREFIX}SDL2main${CMAKE_STATIC_LIBRARY_SUFFIX}
-)
-add_dependencies(SDL2main libs)
 
 add_library(speexdsp SHARED IMPORTED)
 set_target_properties(speexdsp PROPERTIES IMPORTED_LOCATION
@@ -142,7 +139,6 @@ set(COMMON_COMPILE_OPTIONS "${COMMON_COMPILE_OPTIONS} -fPIC")
 set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -Wl,--undefined=Java_org_libsdl_app_SDLActivity_nativeInit")
 set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -Wl,--no-undefined")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=gnu++1z ${COMMON_COMPILE_OPTIONS} -Wnon-virtual-dtor")
-get_filename_component(ORCT2_ROOT "${CMAKE_SOURCE_DIR}/../../../../../" REALPATH)
 
 file(GLOB_RECURSE LIBOPENRCT2_SOURCES
     "${ORCT2_ROOT}/src/openrct2/*.cpp"
@@ -173,7 +169,7 @@ target_link_libraries(openrct2
 add_library(openrct2-ui SHARED ${OPENRCT2_GUI_SOURCES})
 add_executable(openrct2-cli ${OPENRCT2_CLI_SOURCES})
 
-target_link_libraries(openrct2-ui openrct2 GLESv1_CM GLESv2 SDL2main speexdsp)
+target_link_libraries(openrct2-ui openrct2 GLESv1_CM GLESv2 speexdsp)
 target_link_libraries(openrct2-cli openrct2)
 
 target_include_directories(openrct2-ui PRIVATE "${ORCT2_ROOT}/src")
