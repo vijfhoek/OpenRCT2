@@ -402,7 +402,7 @@ static void window_maze_construction_tooldown(rct_window* w, rct_widgetindex wid
     switch (widgetIndex)
     {
         case WIDX_MAZE_DIRECTION_GROUPBOX:
-            ride_construction_tooldown_construct(x, y);
+            ride_construction_toolup_construct(x, y);
             break;
         case WIDX_MAZE_ENTRANCE:
         case WIDX_MAZE_EXIT:

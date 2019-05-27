@@ -666,7 +666,7 @@ void window_resize_gui_scenario_editor(int32_t width, int32_t height);
 void window_ride_construct(rct_window* w);
 void ride_construction_toolupdate_entrance_exit(int32_t screenX, int32_t screenY);
 void ride_construction_toolupdate_construct(int32_t screenX, int32_t screenY);
-void ride_construction_tooldown_construct(int32_t screenX, int32_t screenY);
+void ride_construction_toolup_construct(int32_t screenX, int32_t screenY);
 
 void window_bubble_list_item(rct_window* w, int32_t item_position);
 
