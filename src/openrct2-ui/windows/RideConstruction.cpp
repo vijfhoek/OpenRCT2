@@ -450,6 +450,7 @@ static int32_t _trackPlaceShiftStartScreenY;
 static int32_t _trackPlaceShiftZ;
 static int32_t _trackPlaceZ;
 static money32 _trackPlaceCost;
+static CoordsXYZ _lastTrackBegin;
 static bool _autoOpeningShop;
 static bool _autoRotatingShop;
 static uint8_t _currentlyShowingBrakeOrBoosterSpeed;
@@ -2081,6 +2082,8 @@ static void window_ride_construction_update(rct_window* w)
  */
 static bool ride_get_place_position_from_screen_position(int32_t screenX, int32_t screenY, int32_t* outX, int32_t* outY)
 {
+    const CursorState* cursorState = context_get_cursor_state();
+
     int16_t mapX, mapY, mapZ;
     int32_t interactionType, direction;
     TileElement* tileElement;
@@ -2108,7 +2111,7 @@ static bool ride_get_place_position_from_screen_position(int32_t screenX, int32_
 
     if (!_trackPlaceShiftState)
     {
-        if (gInputPlaceObjectModifier & PLACE_OBJECT_MODIFIER_SHIFT_Z)
+        if (gInputPlaceObjectModifier & PLACE_OBJECT_MODIFIER_SHIFT_Z || cursorState->touchShiftZ)
         {
             _trackPlaceShiftState = true;
             _trackPlaceShiftStartScreenX = screenX;
@@ -2118,7 +2121,7 @@ static bool ride_get_place_position_from_screen_position(int32_t screenX, int32_
     }
     else
     {
-        if (gInputPlaceObjectModifier & PLACE_OBJECT_MODIFIER_SHIFT_Z)
+        if (gInputPlaceObjectModifier & PLACE_OBJECT_MODIFIER_SHIFT_Z || cursorState->touchShiftZ)
         {
             constexpr uint16_t maxHeight = (std::numeric_limits<decltype(TileElement::base_height)>::max() - 32)
                 << MAX_ZOOM_LEVEL;
@@ -2151,7 +2154,7 @@ static bool ride_get_place_position_from_screen_position(int32_t screenX, int32_
             return false;
 
         _trackPlaceZ = 0;
-        if (_trackPlaceShiftState)
+        if (_trackPlaceShiftState || cursorState->touch)
         {
             tileElement = map_get_surface_element_at(mapX >> 5, mapY >> 5);
             mapZ = floor2(tileElement->base_height * 8, 16);
@@ -3740,6 +3743,12 @@ void ride_construction_toolupdate_entrance_exit(int32_t screenX, int32_t screenY
 void ride_construction_toolup_construct(int32_t screenX, int32_t screenY)
 {
     const CursorState* state = context_get_cursor_state();
+    if (state->touch && _currentTrackBegin != _lastTrackBegin)
+    {
+        _lastTrackBegin = _currentTrackBegin;
+        return;
+    }
+
     ride_id_t rideIndex;
     int32_t trackType, trackDirection, liftHillAndAlternativeState, x, y, z, properties, highestZ;
     rct_window* w;

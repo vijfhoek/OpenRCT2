@@ -365,8 +365,11 @@ public:
                     }
                     break;
                 case SDL_MOUSEMOTION:
-                    _cursorState.x = (int32_t)(e.motion.x / gConfigGeneral.window_scale);
-                    _cursorState.y = (int32_t)(e.motion.y / gConfigGeneral.window_scale);
+                    if (_cursorState.touchFirstFingerDown)
+                    {
+                        _cursorState.x = (int32_t)(e.motion.x / gConfigGeneral.window_scale);
+                        _cursorState.y = (int32_t)(e.motion.y / gConfigGeneral.window_scale);
+                    }
                     break;
                 case SDL_MOUSEWHEEL:
                     if (_inGameConsole.IsOpen())
@@ -432,14 +435,18 @@ public:
                 }
                 // Apple sends touchscreen events for trackpads, so ignore these events on macOS
 #ifndef __MACOSX__
-                case SDL_FINGERMOTION:
-                    _cursorState.x = (int32_t)(e.tfinger.x * _width);
-                    _cursorState.y = (int32_t)(e.tfinger.y * _height);
-                    break;
                 case SDL_FINGERDOWN:
                 {
-                    int32_t x = (int32_t)(e.tfinger.x * _width);
-                    int32_t y = (int32_t)(e.tfinger.y * _height);
+                    if (e.tfinger.fingerId != 0)
+                    {
+                        break;
+                    }
+
+                    // Ugly workaround, working around SDL_FINGERMOTION not working properly.
+                    _cursorState.touchFirstFingerDown = true;
+
+                    int32_t x = _cursorState.x = (int32_t)(e.tfinger.x * _width);
+                    int32_t y = _cursorState.y = (int32_t)(e.tfinger.y * _height);
 
                     _cursorState.touchIsDouble
                         = (!_cursorState.touchIsDouble
@@ -463,6 +470,14 @@ public:
                 }
                 case SDL_FINGERUP:
                 {
+                    _cursorState.touchShiftZ = false;
+                    if (e.tfinger.fingerId != 0)
+                    {
+                        break;
+                    }
+
+                    _cursorState.touchFirstFingerDown = false;
+
                     int32_t x = (int32_t)(e.tfinger.x * _width);
                     int32_t y = (int32_t)(e.tfinger.y * _height);
 
@@ -493,15 +508,21 @@ public:
                             _gestureRadius = 0;
                         }
                         _lastGestureTimestamp = e.mgesture.timestamp;
+
                         _gestureRadius += e.mgesture.dDist;
 
                         // Zoom gesture
                         constexpr int32_t tolerance = 128;
-                        int32_t gesturePixels = (int32_t)(_gestureRadius * _width);
-                        if (abs(gesturePixels) > tolerance)
+                        int32_t gestureRadiusPixels = (int32_t)(_gestureRadius * _width);
+
+                        if (abs(gestureRadiusPixels) > tolerance)
                         {
                             _gestureRadius = 0;
-                            main_window_zoom(gesturePixels > 0, true);
+                            main_window_zoom(gestureRadiusPixels > 0, true);
+                        }
+                        else
+                        {
+                            _cursorState.touchShiftZ = abs(gestureRadiusPixels) < 16;
                         }
                     }
                     break;

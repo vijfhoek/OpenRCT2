@@ -107,6 +107,15 @@ struct CoordsXYZ
         , z(_z)
     {
     }
+
+    bool operator==(const CoordsXYZ& other) const
+    {
+        return x == other.x && y == other.y && z == other.z;
+    }
+    bool operator!=(const CoordsXYZ& other) const
+    {
+        return !(*this == other);
+    }
 };
 
 struct TileCoordsXYZ

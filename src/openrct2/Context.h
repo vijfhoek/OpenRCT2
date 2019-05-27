@@ -31,7 +31,10 @@ struct CursorState
     uint8_t left, middle, right, any;
     int32_t wheel;
     int32_t old;
+
     bool touch, touchIsDouble;
+    bool touchFirstFingerDown;
+    bool touchShiftZ;
     uint32_t touchDownTimestamp;
 };
 
