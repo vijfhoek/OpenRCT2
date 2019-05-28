@@ -242,10 +242,16 @@ static void window_game_bottom_toolbar_tooltip(rct_window* w, rct_widgetindex wi
 static void window_game_bottom_toolbar_invalidate(rct_window* w)
 {
     // Figure out how much line height we have to work with.
+    w->width = context_get_width();
     uint32_t line_height = font_get_line_height(FONT_SPRITE_BASE_MEDIUM);
 
     // Reset dimensions as appropriate -- in case we're switching languages.
     w->height = line_height * 2 + 12;
+    if (!news_item_is_queue_empty() && w->width < WIDTH_BREAKPOINT)
+    {
+        w->height *= 2;
+    }
+
     w->y = context_get_height() - w->height;
 
     // Change height of widgets in accordance with line height.
@@ -261,7 +267,7 @@ static void window_game_bottom_toolbar_invalidate(rct_window* w)
         w->widgets[WIDX_GUESTS].top = 1;
         w->widgets[WIDX_GUESTS].bottom = line_height + 7;
         w->widgets[WIDX_PARK_RATING].top = line_height + 8;
-        w->widgets[WIDX_PARK_RATING].bottom = w->height - 1;
+        w->widgets[WIDX_PARK_RATING].bottom = line_height * 2 + 11;
     }
     else
     {
@@ -270,70 +276,83 @@ static void window_game_bottom_toolbar_invalidate(rct_window* w)
         w->widgets[WIDX_GUESTS].top = w->widgets[WIDX_MONEY].bottom + 1;
         w->widgets[WIDX_GUESTS].bottom = w->widgets[WIDX_GUESTS].top + line_height;
         w->widgets[WIDX_PARK_RATING].top = w->widgets[WIDX_GUESTS].bottom - 1;
-        w->widgets[WIDX_PARK_RATING].bottom = w->height - 1;
+        w->widgets[WIDX_PARK_RATING].bottom = line_height * 2 + 11;
     }
 
-    // Reposition right widgets in accordance with line height, too.
+    // Reposition right widgets.
     w->widgets[WIDX_DATE].bottom = line_height + 1;
 
-    // Anchor the middle and right panel to the right
-    int32_t x = context_get_width();
-    w->width = x;
-    x--;
-    window_game_bottom_toolbar_widgets[WIDX_RIGHT_OUTSET].right = x;
-    x -= 2;
-    window_game_bottom_toolbar_widgets[WIDX_RIGHT_INSET].right = x;
-    x -= 137;
-    window_game_bottom_toolbar_widgets[WIDX_RIGHT_INSET].left = x;
-    x -= 2;
-    window_game_bottom_toolbar_widgets[WIDX_RIGHT_OUTSET].left = x;
-    x--;
-    window_game_bottom_toolbar_widgets[WIDX_MIDDLE_OUTSET].right = x;
-    x -= 2;
-    window_game_bottom_toolbar_widgets[WIDX_MIDDLE_INSET].right = x;
-    x -= 3;
-    window_game_bottom_toolbar_widgets[WIDX_NEWS_LOCATE].right = x;
-    x -= 23;
-    window_game_bottom_toolbar_widgets[WIDX_NEWS_LOCATE].left = x;
-    window_game_bottom_toolbar_widgets[WIDX_DATE].left = window_game_bottom_toolbar_widgets[WIDX_RIGHT_OUTSET].left + 2;
-    window_game_bottom_toolbar_widgets[WIDX_DATE].right = window_game_bottom_toolbar_widgets[WIDX_RIGHT_OUTSET].right - 2;
+    // Move the middle panel down when the two-row layout is active.
+    w->widgets[WIDX_MIDDLE_OUTSET].bottom = w->height;
+    w->widgets[WIDX_MIDDLE_INSET].bottom = w->height - 2;
+    w->widgets[WIDX_NEWS_SUBJECT].bottom = w->height - 5;
+    w->widgets[WIDX_NEWS_LOCATE].bottom = w->height - 5;
 
-    window_game_bottom_toolbar_widgets[WIDX_LEFT_INSET].type = WWT_EMPTY;
-    window_game_bottom_toolbar_widgets[WIDX_RIGHT_INSET].type = WWT_EMPTY;
+    int32_t y = w->width < WIDTH_BREAKPOINT ? w->height / 2 : 0;
+    w->widgets[WIDX_MIDDLE_OUTSET].top = y;
+    w->widgets[WIDX_MIDDLE_INSET].top = y + 2;
+    w->widgets[WIDX_NEWS_SUBJECT].top = y + 5;
+    w->widgets[WIDX_NEWS_LOCATE].top = y + 5;
+
+    // Right side and right-aligned widgets in the middle panel.
+    int32_t x = w->width < WIDTH_BREAKPOINT ? w->width : w->width - 143;
+    w->widgets[WIDX_MIDDLE_OUTSET].right = x;
+    w->widgets[WIDX_MIDDLE_INSET].right = x - 2;
+    w->widgets[WIDX_NEWS_LOCATE].right = x - 5;
+    w->widgets[WIDX_NEWS_LOCATE].left = x - 28;
+
+    // Left side and left-aligned widgets in the middle panel.
+    x = w->width < WIDTH_BREAKPOINT ? 0 : 142;
+    w->widgets[WIDX_MIDDLE_OUTSET].left = x;
+    w->widgets[WIDX_MIDDLE_INSET].left = x + 2;
+    w->widgets[WIDX_NEWS_SUBJECT].left = x + 5;
+
+    // Right panel
+    x = w->width;
+    w->widgets[WIDX_RIGHT_OUTSET].right = x - 1;
+    w->widgets[WIDX_RIGHT_INSET].right = x - 3;
+    w->widgets[WIDX_RIGHT_INSET].left = x - 140;
+    w->widgets[WIDX_RIGHT_OUTSET].left = x - 142;
+
+    w->widgets[WIDX_DATE].left = w->widgets[WIDX_RIGHT_OUTSET].left + 2;
+    w->widgets[WIDX_DATE].right = w->widgets[WIDX_RIGHT_OUTSET].right - 2;
+
+    w->widgets[WIDX_LEFT_INSET].type = WWT_EMPTY;
+    w->widgets[WIDX_RIGHT_INSET].type = WWT_EMPTY;
 
     if (news_item_is_queue_empty())
     {
         if (!(theme_get_flags() & UITHEME_FLAG_USE_FULL_BOTTOM_TOOLBAR))
         {
-            window_game_bottom_toolbar_widgets[WIDX_MIDDLE_OUTSET].type = WWT_EMPTY;
-            window_game_bottom_toolbar_widgets[WIDX_MIDDLE_INSET].type = WWT_EMPTY;
-            window_game_bottom_toolbar_widgets[WIDX_NEWS_SUBJECT].type = WWT_EMPTY;
-            window_game_bottom_toolbar_widgets[WIDX_NEWS_LOCATE].type = WWT_EMPTY;
+            w->widgets[WIDX_MIDDLE_OUTSET].type = WWT_EMPTY;
+            w->widgets[WIDX_MIDDLE_INSET].type = WWT_EMPTY;
+            w->widgets[WIDX_NEWS_SUBJECT].type = WWT_EMPTY;
+            w->widgets[WIDX_NEWS_LOCATE].type = WWT_EMPTY;
         }
         else
         {
-            window_game_bottom_toolbar_widgets[WIDX_MIDDLE_OUTSET].type = WWT_IMGBTN;
-            window_game_bottom_toolbar_widgets[WIDX_MIDDLE_INSET].type = WWT_PLACEHOLDER;
-            window_game_bottom_toolbar_widgets[WIDX_NEWS_SUBJECT].type = WWT_EMPTY;
-            window_game_bottom_toolbar_widgets[WIDX_NEWS_LOCATE].type = WWT_EMPTY;
-            window_game_bottom_toolbar_widgets[WIDX_MIDDLE_OUTSET].colour = 0;
-            window_game_bottom_toolbar_widgets[WIDX_MIDDLE_INSET].colour = 0;
+            w->widgets[WIDX_MIDDLE_OUTSET].type = WWT_IMGBTN;
+            w->widgets[WIDX_MIDDLE_INSET].type = WWT_PLACEHOLDER;
+            w->widgets[WIDX_NEWS_SUBJECT].type = WWT_EMPTY;
+            w->widgets[WIDX_NEWS_LOCATE].type = WWT_EMPTY;
+            w->widgets[WIDX_MIDDLE_OUTSET].colour = 0;
+            w->widgets[WIDX_MIDDLE_INSET].colour = 0;
         }
     }
     else
     {
         NewsItem* newsItem = news_item_get(0);
-        window_game_bottom_toolbar_widgets[WIDX_MIDDLE_OUTSET].type = WWT_IMGBTN;
-        window_game_bottom_toolbar_widgets[WIDX_MIDDLE_INSET].type = WWT_PLACEHOLDER;
-        window_game_bottom_toolbar_widgets[WIDX_NEWS_SUBJECT].type = WWT_FLATBTN;
-        window_game_bottom_toolbar_widgets[WIDX_NEWS_LOCATE].type = WWT_FLATBTN;
-        window_game_bottom_toolbar_widgets[WIDX_MIDDLE_OUTSET].colour = 2;
-        window_game_bottom_toolbar_widgets[WIDX_MIDDLE_INSET].colour = 2;
+        w->widgets[WIDX_MIDDLE_OUTSET].type = WWT_IMGBTN;
+        w->widgets[WIDX_MIDDLE_INSET].type = WWT_PLACEHOLDER;
+        w->widgets[WIDX_NEWS_SUBJECT].type = WWT_FLATBTN;
+        w->widgets[WIDX_NEWS_LOCATE].type = WWT_FLATBTN;
+        w->widgets[WIDX_MIDDLE_OUTSET].colour = 2;
+        w->widgets[WIDX_MIDDLE_INSET].colour = 2;
         w->disabled_widgets &= ~(1 << WIDX_NEWS_SUBJECT);
         w->disabled_widgets &= ~(1 << WIDX_NEWS_LOCATE);
 
         // Find out if the news item is no longer valid
-        int32_t y, z;
+        int32_t z;
         int32_t subject = newsItem->Assoc;
         news_item_get_subject_location(newsItem->Type, subject, &x, &y, &z);
 
@@ -343,7 +362,7 @@ static void window_game_bottom_toolbar_invalidate(rct_window* w)
         if (!(news_type_properties[newsItem->Type] & NEWS_TYPE_HAS_SUBJECT))
         {
             w->disabled_widgets |= (1 << WIDX_NEWS_SUBJECT);
-            window_game_bottom_toolbar_widgets[WIDX_NEWS_SUBJECT].type = WWT_EMPTY;
+            w->widgets[WIDX_NEWS_SUBJECT].type = WWT_EMPTY;
         }
 
         if (newsItem->Flags & NEWS_FLAG_HAS_BUTTON)

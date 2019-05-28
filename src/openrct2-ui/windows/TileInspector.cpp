@@ -14,6 +14,7 @@
 #include <openrct2-ui/windows/Window.h>
 #include <openrct2/Game.h>
 #include <openrct2/Input.h>
+#include <openrct2/Context.h>
 #include <openrct2/common.h>
 #include <openrct2/core/Guard.hpp>
 #include <openrct2/localisation/Localisation.h>
@@ -550,7 +551,7 @@ rct_window* window_tile_inspector_open()
     if (window != nullptr)
         return window;
 
-    window = window_create(0, 29, WW, WH, &TileInspectorWindowEvents, WC_TILE_INSPECTOR, WF_RESIZABLE);
+    window = window_create(0, UI_MIN_Y, WW, WH, &TileInspectorWindowEvents, WC_TILE_INSPECTOR, WF_RESIZABLE);
 
     window_tile_inspector_set_page(window, TILE_INSPECTOR_PAGE_DEFAULT);
     window->min_width = MIN_WW;

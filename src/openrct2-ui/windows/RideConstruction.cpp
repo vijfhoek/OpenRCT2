@@ -532,7 +532,7 @@ rct_window* window_ride_construction_open()
         return context_open_window_view(WV_MAZE_CONSTRUCTION);
     }
 
-    w = window_create(0, 29, 166, 394, &window_ride_construction_events, WC_RIDE_CONSTRUCTION, WF_NO_AUTO_CLOSE);
+    w = window_create(0, UI_MIN_Y, 166, 394, &window_ride_construction_events, WC_RIDE_CONSTRUCTION, WF_NO_AUTO_CLOSE);
 
     w->widgets = window_ride_construction_widgets;
     w->enabled_widgets = (1ULL << WIDX_CLOSE) | (1ULL << WIDX_LEFT_CURVE_VERY_SMALL) | (1ULL << WIDX_LEFT_CURVE_SMALL)

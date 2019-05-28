@@ -795,6 +795,11 @@ static void window_top_toolbar_invalidate(rct_window* w)
             enabledWidgets |= (1 << i);
     w->enabled_widgets = enabledWidgets;
 
+    // If the screen is less than 640 pixels wide, increase the height of the
+    // toolbar to fit all buttons.
+    int32_t screenWidth = context_get_width();
+    w->height = (screenWidth < WIDTH_BREAKPOINT ? 2 : 1) * TOP_TOOLBAR_HEIGHT + 1;
+
     // Align left hand side toolbar buttons
     firstAlignment = 1;
     x = 0;
@@ -817,9 +822,8 @@ static void window_top_toolbar_invalidate(rct_window* w)
     }
 
     // Align right hand side toolbar buttons
-    int32_t screenWidth = context_get_width();
     firstAlignment = 1;
-    x = std::max(640, screenWidth);
+    x = screenWidth;
     for (size_t i = 0; i < std::size(right_aligned_widgets_order); ++i)
     {
         widgetIndex = right_aligned_widgets_order[i];
@@ -836,6 +840,10 @@ static void window_top_toolbar_invalidate(rct_window* w)
         x -= widgetWidth;
         widget->left = x;
         firstAlignment = 0;
+
+        // Move the right-hand side buttons down when the two-row layout is active.
+        widget->top = screenWidth < WIDTH_BREAKPOINT ? TOP_TOOLBAR_HEIGHT : 0;
+        widget->bottom = widget->top + TOP_TOOLBAR_HEIGHT;
     }
 
     // Footpath button pressed down

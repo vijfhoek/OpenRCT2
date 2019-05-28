@@ -448,7 +448,7 @@ rct_window* window_scenery_open()
     window_scenery_init();
 
     window = window_create(
-        context_get_width() - WINDOW_SCENERY_WIDTH, 0x1D, WINDOW_SCENERY_WIDTH, WINDOW_SCENERY_HEIGHT, &window_scenery_events,
+        context_get_width() - WINDOW_SCENERY_WIDTH, UI_MIN_Y, WINDOW_SCENERY_WIDTH, WINDOW_SCENERY_HEIGHT, &window_scenery_events,
         WC_SCENERY, WF_NO_SCROLLING);
     window->widgets = window_scenery_widgets;
 
