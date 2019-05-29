@@ -365,7 +365,7 @@ public:
                     }
                     break;
                 case SDL_MOUSEMOTION:
-                    if (_cursorState.touchFirstFingerDown)
+                    if (_cursorState.touchFirstFingerDown || e.button.which != SDL_TOUCH_MOUSEID)
                     {
                         _cursorState.x = (int32_t)(e.motion.x / gConfigGeneral.window_scale);
                         _cursorState.y = (int32_t)(e.motion.y / gConfigGeneral.window_scale);
