@@ -31,7 +31,7 @@ struct scenario_index_entry;
 #define TEXT_INPUT_SIZE 1024
 #define TOP_TOOLBAR_HEIGHT 27
 
-#define WIDTH_BREAKPOINT 640
+#define WIDTH_BREAKPOINT 600
 #define UI_MIN_Y ((context_get_width() < WIDTH_BREAKPOINT ? TOP_TOOLBAR_HEIGHT * 2 : TOP_TOOLBAR_HEIGHT) + 2)
 
 extern uint16_t TextInputDescriptionArgs[4];

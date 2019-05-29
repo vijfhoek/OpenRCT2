@@ -34,8 +34,11 @@
 #include <openrct2/world/Park.h>
 
 #define AVAILABILITY_STRING_SIZE 256
+#define RIDE_ITEM_SIZE 116
+
 #define WH 382
-#define WW 601
+#define MIN_WW ((RIDE_ITEM_SIZE * 2) + 20)
+#define MAX_WW ((RIDE_ITEM_SIZE * 5) + 22)
 
 static uint8_t _windowNewRideCurrentTab;
 static ride_list_item _windowNewRideHighlightedItem[6];
@@ -204,6 +207,7 @@ static rct_widget window_new_ride_widgets[] = {
 #pragma region Events
 
 static void window_new_ride_mouseup(rct_window *w, rct_widgetindex widgetIndex);
+static void window_new_ride_resize(rct_window *w);
 static void window_new_ride_mousedown(rct_window *w, rct_widgetindex widgetIndex, rct_widget *widget);
 static void window_new_ride_update(rct_window *w);
 static void window_new_ride_scrollgetsize(rct_window *w, int32_t scrollIndex, int32_t *width, int32_t *height);
@@ -218,7 +222,7 @@ static void window_new_ride_list_vehicles_for(const uint8_t rideType, const rct_
 static rct_window_event_list window_new_ride_events = {
     nullptr,
     window_new_ride_mouseup,
-    nullptr,
+    window_new_ride_resize,
     window_new_ride_mousedown,
     nullptr,
     nullptr,
@@ -431,6 +435,11 @@ static ride_list_item* window_new_ride_iterate_over_ride_group(
     return nextListItem;
 }
 
+static constexpr int32_t window_new_ride_row_width(rct_window* w)
+{
+    return (w->width - 21) / RIDE_ITEM_SIZE;
+}
+
 /**
  *
  *  rct2: 0x006B7220
@@ -451,7 +460,7 @@ static void window_new_ride_scroll_to_focused_ride(rct_window* w)
     {
         if (listItem->type == focusRideType)
         {
-            row = count / 5;
+            row = count / window_new_ride_row_width(w);
             break;
         }
 
@@ -462,7 +471,7 @@ static void window_new_ride_scroll_to_focused_ride(rct_window* w)
     // Update the Y scroll position
     int32_t listWidgetHeight = listWidget->bottom - listWidget->top - 1;
     scrollHeight = std::max(0, scrollHeight - listWidgetHeight);
-    w->scrolls[0].v_top = std::min(row * 116, scrollHeight);
+    w->scrolls[0].v_top = std::min(row * RIDE_ITEM_SIZE, scrollHeight);
     widget_scroll_update_thumbs(w, WIDX_RIDE_LIST);
 }
 
@@ -482,7 +491,7 @@ rct_window* window_new_ride_open()
     window_close_by_class(WC_TRACK_DESIGN_LIST);
     window_close_by_class(WC_TRACK_DESIGN_PLACE);
 
-    w = window_create_auto_pos(WW, WH, &window_new_ride_events, WC_CONSTRUCT_RIDE, WF_10);
+    w = window_create_auto_pos(context_get_width(), WH, &window_new_ride_events, WC_CONSTRUCT_RIDE, WF_10 | WF_RESIZABLE);
     w->widgets = window_new_ride_widgets;
     w->enabled_widgets = (1 << WIDX_CLOSE) | (1 << WIDX_TAB_1) | (1 << WIDX_TAB_2) | (1 << WIDX_TAB_3) | (1 << WIDX_TAB_4)
         | (1 << WIDX_TAB_5) | (1 << WIDX_TAB_6) | (1 << WIDX_TAB_7) | (1 << WIDX_LAST_DEVELOPMENT_BUTTON)
@@ -498,8 +507,9 @@ rct_window* window_new_ride_open()
     if (w->new_ride.highlighted_ride_id == -1)
         w->new_ride.highlighted_ride_id = _windowNewRideListItems[0].ride_type_and_entry;
 
-    w->width = 1;
     window_new_ride_refresh_widget_sizing(w);
+    w->min_width = MIN_WW;
+    w->max_width = MAX_WW;
 
     if (_windowNewRideCurrentTab != WINDOW_NEW_RIDE_PAGE_RESEARCH)
     {
@@ -576,6 +586,11 @@ void window_new_ride_focus(ride_list_item rideItem)
 
 static void window_new_ride_set_page(rct_window* w, int32_t page)
 {
+    if (page < WINDOW_NEW_RIDE_PAGE_RESEARCH && _windowNewRideCurrentTab == WINDOW_NEW_RIDE_PAGE_RESEARCH)
+    {
+        w->width = context_get_width();
+    }
+
     _windowNewRideCurrentTab = page;
     w->frame_no = 0;
     w->new_ride.highlighted_ride_id = -1;
@@ -608,17 +623,19 @@ static void window_new_ride_refresh_widget_sizing(rct_window* w)
     // Show or hide unrelated widgets
     if (_windowNewRideCurrentTab != WINDOW_NEW_RIDE_PAGE_RESEARCH)
     {
+        w->flags |= ~WF_RESIZABLE;
         window_new_ride_widgets[WIDX_RIDE_LIST].type = WWT_SCROLL;
         window_new_ride_widgets[WIDX_CURRENTLY_IN_DEVELOPMENT_GROUP].type = WWT_EMPTY;
         window_new_ride_widgets[WIDX_LAST_DEVELOPMENT_GROUP].type = WWT_EMPTY;
         window_new_ride_widgets[WIDX_LAST_DEVELOPMENT_BUTTON].type = WWT_EMPTY;
         window_new_ride_widgets[WIDX_RESEARCH_FUNDING_BUTTON].type = WWT_EMPTY;
 
-        width = 601;
+        width = std::min((w->width - 21) / RIDE_ITEM_SIZE * RIDE_ITEM_SIZE + 21, MAX_WW);
         height = WH;
     }
     else
     {
+        w->flags &= ~WF_RESIZABLE;
         window_new_ride_widgets[WIDX_RIDE_LIST].type = WWT_EMPTY;
         window_new_ride_widgets[WIDX_CURRENTLY_IN_DEVELOPMENT_GROUP].type = WWT_GROUPBOX;
         window_new_ride_widgets[WIDX_LAST_DEVELOPMENT_GROUP].type = WWT_GROUPBOX;
@@ -640,6 +657,7 @@ static void window_new_ride_refresh_widget_sizing(rct_window* w)
         window_new_ride_widgets[WIDX_BACKGROUND].bottom = height - 1;
         window_new_ride_widgets[WIDX_PAGE_BACKGROUND].right = width - 1;
         window_new_ride_widgets[WIDX_PAGE_BACKGROUND].bottom = height - 1;
+        window_new_ride_widgets[WIDX_RIDE_LIST].right = width - 1;
         window_new_ride_widgets[WIDX_TITLE].right = width - 2;
         window_new_ride_widgets[WIDX_CLOSE].left = width - 13;
         window_new_ride_widgets[WIDX_CLOSE].right = width - 3;
@@ -713,6 +731,22 @@ static void window_new_ride_mouseup(rct_window* w, rct_widgetindex widgetIndex)
     }
 }
 
+static void window_new_ride_resize(rct_window* w)
+{
+    if ((w->width - 21) % RIDE_ITEM_SIZE != 0)
+    {
+        // Add a half "snap" width to make it snap halfway between two sizes,
+        // instead of at the end. This feels much more natural.
+        w->width += RIDE_ITEM_SIZE / 2;
+
+        window_new_ride_refresh_widget_sizing(w);
+    }
+    else
+    {
+        window_invalidate(w);
+    }
+}
+
 /**
  *
  *  rct2: 0x006B6B4F
@@ -756,7 +790,9 @@ static void window_new_ride_scrollgetsize(rct_window* w, int32_t scrollIndex, in
         count++;
         listItem++;
     }
-    *height = ((count + 4) / 5) * 116;
+
+    int32_t rowWidth = window_new_ride_row_width(w);
+    *height = ((count + rowWidth - 1) / rowWidth) * RIDE_ITEM_SIZE;
 }
 
 /**
@@ -887,11 +923,11 @@ static void window_new_ride_scrollpaint(rct_window* w, rct_drawpixelinfo* dpi, i
         gfx_draw_sprite_raw_masked(dpi, x + 2, y + 2, SPR_NEW_RIDE_MASK, imageId);
 
         // Next position
-        x += 116;
-        if (x >= 116 * 5 + 1)
+        x += RIDE_ITEM_SIZE;
+        if (x >= RIDE_ITEM_SIZE * window_new_ride_row_width(w) + 1)
         {
             x = 1;
-            y += 116;
+            y += RIDE_ITEM_SIZE;
         }
 
         // Next item
@@ -912,12 +948,13 @@ static ride_list_item window_new_ride_scroll_get_ride_list_item_at(rct_window* w
     if (--x < 0 || --y < 0)
         return result;
 
-    int32_t column = x / 116;
-    int32_t row = y / 116;
-    if (column >= 5)
+    int32_t column = x / RIDE_ITEM_SIZE;
+    int32_t row = y / RIDE_ITEM_SIZE;
+    int32_t rowWidth = window_new_ride_row_width(w);
+    if (column >= rowWidth)
         return result;
 
-    int32_t index = column + (row * 5);
+    int32_t index = column + (row * rowWidth);
 
     ride_list_item* listItem = _windowNewRideListItems;
     while (listItem->type != RIDE_TYPE_NULL || listItem->entry_index != RIDE_ENTRY_INDEX_NULL)
@@ -981,7 +1018,7 @@ static void window_new_ride_paint_ride_information(
     if (availabilityString[0] != 0)
     {
         const char* drawString = availabilityString;
-        gfx_draw_string_left_clipped(dpi, STR_AVAILABLE_VEHICLES, &drawString, COLOUR_BLACK, x, y + 39, WW - 2);
+        gfx_draw_string_left_clipped(dpi, STR_AVAILABLE_VEHICLES, &drawString, COLOUR_BLACK, x, y + 39, w->width - 2);
     }
 
     // Track designs are disabled in multiplayer, so don't say there are any designs available when in multiplayer
@@ -1032,7 +1069,7 @@ static void window_new_ride_paint_ride_information(
         if (!ride_type_has_flag(item.type, RIDE_TYPE_FLAG_HAS_NO_TRACK))
             stringId = STR_NEW_RIDE_COST_FROM;
 
-        gfx_draw_string_right(dpi, stringId, &price, COLOUR_BLACK, x + width, y + 51);
+        gfx_draw_string_right(dpi, stringId, &price, COLOUR_BLACK, x + width - 12, y + 51);
     }
 }
 
