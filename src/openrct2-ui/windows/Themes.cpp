@@ -866,31 +866,23 @@ void window_themes_scrollpaint(rct_window* w, rct_drawpixelinfo* dpi, int32_t sc
             if (i + 1 < get_colour_scheme_tab_count())
             {
                 int32_t colour = w->colours[1];
+                const ScreenRect highlightRect{
+                    { 0, screenCoords.y + _row_height - 2 },
+                    { window_themes_widgets[WIDX_THEMES_LIST].right, screenCoords.y + _row_height - 2 },
+                };
+                const ScreenRect shadowRect{ highlightRect.Point1 + ScreenCoordsXY{ 0, 1 },
+                                             highlightRect.Point2 + ScreenCoordsXY{ 0, 1 } };
+
                 if (colour & COLOUR_FLAG_TRANSLUCENT)
                 {
                     translucent_window_palette windowPalette = TranslucentWindowPalettes[BASE_COLOUR(colour)];
-
-                    gfx_filter_rect(
-                        dpi, 0, screenCoords.y + _row_height - 2, window_themes_widgets[WIDX_THEMES_LIST].right,
-                        screenCoords.y + _row_height - 2, windowPalette.highlight);
-                    gfx_filter_rect(
-                        dpi, 0, screenCoords.y + _row_height - 1, window_themes_widgets[WIDX_THEMES_LIST].right,
-                        screenCoords.y + _row_height - 1, windowPalette.shadow);
+                    gfx_filter_rect(dpi, highlightRect, windowPalette.highlight);
+                    gfx_filter_rect(dpi, shadowRect, windowPalette.shadow);
                 }
                 else
                 {
-                    colour = ColourMapA[w->colours[1]].mid_dark;
-                    gfx_fill_rect(
-                        dpi,
-                        { { 0, screenCoords.y + _row_height - 2 },
-                          { window_themes_widgets[WIDX_THEMES_LIST].right, screenCoords.y + _row_height - 2 } },
-                        colour);
-                    colour = ColourMapA[w->colours[1]].lightest;
-                    gfx_fill_rect(
-                        dpi,
-                        { { 0, screenCoords.y + _row_height - 1 },
-                          { window_themes_widgets[WIDX_THEMES_LIST].right, screenCoords.y + _row_height - 1 } },
-                        colour);
+                    gfx_fill_rect(dpi, highlightRect, ColourMapA[w->colours[1]].mid_dark);
+                    gfx_fill_rect(dpi, shadowRect, ColourMapA[w->colours[1]].lightest);
                 }
             }
 

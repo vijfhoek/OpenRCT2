@@ -344,6 +344,15 @@ void window_game_bottom_toolbar_invalidate_news_item()
     }
 }
 
+static constexpr ScreenRect window_game_bottom_toolbar_widget_screenrect(
+    rct_window* w, size_t index, int32_t topLeftOffset = 0, int32_t bottomRightOffset = 0)
+{
+    return { { w->windowPos.x + window_game_bottom_toolbar_widgets[index].left + topLeftOffset,
+               w->windowPos.y + window_game_bottom_toolbar_widgets[index].top + topLeftOffset },
+             { w->windowPos.x + window_game_bottom_toolbar_widgets[index].right + bottomRightOffset,
+               w->windowPos.y + window_game_bottom_toolbar_widgets[index].bottom + bottomRightOffset } };
+}
+
 /**
  *
  *  rct2: 0x0066BC87
@@ -351,25 +360,14 @@ void window_game_bottom_toolbar_invalidate_news_item()
 static void window_game_bottom_toolbar_paint(rct_window* w, rct_drawpixelinfo* dpi)
 {
     // Draw panel grey backgrounds
-    gfx_filter_rect(
-        dpi, w->windowPos.x + window_game_bottom_toolbar_widgets[WIDX_LEFT_OUTSET].left,
-        w->windowPos.y + window_game_bottom_toolbar_widgets[WIDX_LEFT_OUTSET].top,
-        w->windowPos.x + window_game_bottom_toolbar_widgets[WIDX_LEFT_OUTSET].right,
-        w->windowPos.y + window_game_bottom_toolbar_widgets[WIDX_LEFT_OUTSET].bottom, FilterPaletteID::Palette51);
-    gfx_filter_rect(
-        dpi, w->windowPos.x + window_game_bottom_toolbar_widgets[WIDX_RIGHT_OUTSET].left,
-        w->windowPos.y + window_game_bottom_toolbar_widgets[WIDX_RIGHT_OUTSET].top,
-        w->windowPos.x + window_game_bottom_toolbar_widgets[WIDX_RIGHT_OUTSET].right,
-        w->windowPos.y + window_game_bottom_toolbar_widgets[WIDX_RIGHT_OUTSET].bottom, FilterPaletteID::Palette51);
+    gfx_filter_rect(dpi, window_game_bottom_toolbar_widget_screenrect(w, WIDX_LEFT_OUTSET), FilterPaletteID::Palette51);
+    gfx_filter_rect(dpi, window_game_bottom_toolbar_widget_screenrect(w, WIDX_RIGHT_OUTSET), FilterPaletteID::Palette51);
 
     if (ThemeGetFlags() & UITHEME_FLAG_USE_FULL_BOTTOM_TOOLBAR)
     {
         // Draw grey background
         gfx_filter_rect(
-            dpi, w->windowPos.x + window_game_bottom_toolbar_widgets[WIDX_MIDDLE_OUTSET].left,
-            w->windowPos.y + window_game_bottom_toolbar_widgets[WIDX_MIDDLE_OUTSET].top,
-            w->windowPos.x + window_game_bottom_toolbar_widgets[WIDX_MIDDLE_OUTSET].right,
-            w->windowPos.y + window_game_bottom_toolbar_widgets[WIDX_MIDDLE_OUTSET].bottom, FilterPaletteID::Palette51);
+            dpi, window_game_bottom_toolbar_widget_screenrect(w, WIDX_MIDDLE_OUTSET), FilterPaletteID::Palette51);
     }
 
     WindowDrawWidgets(w, dpi);
@@ -389,14 +387,9 @@ static void window_game_bottom_toolbar_paint(rct_window* w, rct_drawpixelinfo* d
 
 static void window_game_bottom_toolbar_draw_left_panel(rct_drawpixelinfo* dpi, rct_window* w)
 {
-    const auto topLeft = w->windowPos
-        + ScreenCoordsXY{ window_game_bottom_toolbar_widgets[WIDX_LEFT_OUTSET].left + 1,
-                          window_game_bottom_toolbar_widgets[WIDX_LEFT_OUTSET].top + 1 };
-    const auto bottomRight = w->windowPos
-        + ScreenCoordsXY{ window_game_bottom_toolbar_widgets[WIDX_LEFT_OUTSET].right - 1,
-                          window_game_bottom_toolbar_widgets[WIDX_LEFT_OUTSET].bottom - 1 };
     // Draw green inset rectangle on panel
-    gfx_fill_rect_inset(dpi, { topLeft, bottomRight }, w->colours[1], INSET_RECT_F_30);
+    gfx_fill_rect_inset(
+        dpi, window_game_bottom_toolbar_widget_screenrect(w, WIDX_LEFT_OUTSET, 1, -1), w->colours[1], INSET_RECT_F_30);
 
     // Figure out how much line height we have to work with.
     uint32_t line_height = font_get_line_height(FontSpriteBase::MEDIUM);
@@ -484,20 +477,9 @@ static void window_game_bottom_toolbar_draw_park_rating(
 
 static void window_game_bottom_toolbar_draw_right_panel(rct_drawpixelinfo* dpi, rct_window* w)
 {
-    const auto topLeft = w->windowPos
-        + ScreenCoordsXY{ window_game_bottom_toolbar_widgets[WIDX_RIGHT_OUTSET].left + 1,
-                          window_game_bottom_toolbar_widgets[WIDX_RIGHT_OUTSET].top + 1 };
-    const auto bottomRight = w->windowPos
-        + ScreenCoordsXY{ window_game_bottom_toolbar_widgets[WIDX_RIGHT_OUTSET].right - 1,
-                          window_game_bottom_toolbar_widgets[WIDX_RIGHT_OUTSET].bottom - 1 };
     // Draw green inset rectangle on panel
-    gfx_fill_rect_inset(dpi, { topLeft, bottomRight }, w->colours[1], INSET_RECT_F_30);
-
-    auto screenCoords = ScreenCoordsXY{ (window_game_bottom_toolbar_widgets[WIDX_RIGHT_OUTSET].left
-                                         + window_game_bottom_toolbar_widgets[WIDX_RIGHT_OUTSET].right)
-                                                / 2
-                                            + w->windowPos.x,
-                                        window_game_bottom_toolbar_widgets[WIDX_RIGHT_OUTSET].top + w->windowPos.y + 2 };
+    gfx_fill_rect_inset(
+        dpi, window_game_bottom_toolbar_widget_screenrect(w, WIDX_RIGHT_OUTSET, 1, -1), w->colours[1], INSET_RECT_F_30);
 
     // Date
     int32_t year = date_get_year(gDateMonthsElapsed) + 1;
@@ -513,6 +495,14 @@ static void window_game_bottom_toolbar_draw_right_panel(rct_drawpixelinfo* dpi, 
     ft.Add<rct_string_id>(DateDayNames[day]);
     ft.Add<int16_t>(month);
     ft.Add<int16_t>(year);
+
+    auto screenCoords = w->windowPos
+        + ScreenCoordsXY{
+              (window_game_bottom_toolbar_widgets[WIDX_RIGHT_OUTSET].left
+               + window_game_bottom_toolbar_widgets[WIDX_RIGHT_OUTSET].right)
+                  / 2,
+              window_game_bottom_toolbar_widgets[WIDX_RIGHT_OUTSET].top + 2,
+          };
     DrawTextBasic(dpi, screenCoords, stringId, ft, { colour, TextAlignment::CENTRE });
 
     // Figure out how much line height we have to work with.
@@ -565,10 +555,7 @@ static void window_game_bottom_toolbar_draw_news_item(rct_drawpixelinfo* dpi, rc
 
     // Current news item
     gfx_fill_rect_inset(
-        dpi,
-        { w->windowPos + ScreenCoordsXY{ middleOutsetWidget->left + 1, middleOutsetWidget->top + 1 },
-          w->windowPos + ScreenCoordsXY{ middleOutsetWidget->right - 1, middleOutsetWidget->bottom - 1 } },
-        w->colours[2], INSET_RECT_F_30);
+        dpi, window_game_bottom_toolbar_widget_screenrect(w, WIDX_MIDDLE_OUTSET, 1, -1), w->colours[2], INSET_RECT_F_30);
 
     // Text
     const auto* newsItemText = newsItem->Text.c_str();
@@ -659,10 +646,7 @@ static void window_game_bottom_toolbar_draw_middle_panel(rct_drawpixelinfo* dpi,
     rct_widget* middleOutsetWidget = &window_game_bottom_toolbar_widgets[WIDX_MIDDLE_OUTSET];
 
     gfx_fill_rect_inset(
-        dpi,
-        { w->windowPos + ScreenCoordsXY{ middleOutsetWidget->left + 1, middleOutsetWidget->top + 1 },
-          w->windowPos + ScreenCoordsXY{ middleOutsetWidget->right - 1, middleOutsetWidget->bottom - 1 } },
-        w->colours[1], INSET_RECT_F_30);
+        dpi, window_game_bottom_toolbar_widget_screenrect(w, WIDX_MIDDLE_OUTSET, 1, -1), w->colours[1], INSET_RECT_F_30);
 
     // Figure out how much line height we have to work with.
     uint32_t line_height = font_get_line_height(FontSpriteBase::MEDIUM);
